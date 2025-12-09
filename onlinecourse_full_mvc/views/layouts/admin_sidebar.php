@@ -5,7 +5,7 @@
         <aside class="col-md-3 col-lg-2 mb-4">
             <div class="card shadow-sm">
                 <div class="card-body text-center">
-                    <img src="assets/uploads/avatars/admin.png"
+                    <img src="assets/uploads/images/AnhDangHuy.jpg"
                          class="rounded-circle mb-3" width="80" height="80" alt="Admin">
 
                     <h6 class="mb-0">Quản trị viên</h6>
