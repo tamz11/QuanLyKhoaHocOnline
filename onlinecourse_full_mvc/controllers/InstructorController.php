@@ -4,8 +4,12 @@ require_once 'BaseController.php';
 
 class InstructorController extends BaseController
 {
+    // ===========================
+    // DASHBOARD GIẢNG VIÊN
+    // ===========================
     public function dashboard()
     {
+        $this->requireRole([1, 2]); // giảng viên + admin
         $this->render('instructor/dashboard');
     }
 
@@ -14,6 +18,7 @@ class InstructorController extends BaseController
     // ===========================
     public function myCourses()
     {
+        $this->requireRole([1, 2]);
         $this->render('instructor/my_courses');
     }
 
@@ -22,16 +27,19 @@ class InstructorController extends BaseController
     // ===========================
     public function lessons()
     {
+        $this->requireRole([1, 2]);
         $this->render('instructor/lessons/manage');
     }
 
     public function createLesson()
     {
+        $this->requireRole([1, 2]);
         $this->render('instructor/lessons/create');
     }
 
     public function editLesson()
     {
+        $this->requireRole([1, 2]);
         $this->render('instructor/lessons/edit');
     }
 
@@ -40,6 +48,7 @@ class InstructorController extends BaseController
     // ===========================
     public function materials()
     {
+        $this->requireRole([1, 2]);
         $this->render('instructor/materials/upload');
     }
 
@@ -48,6 +57,7 @@ class InstructorController extends BaseController
     // ===========================
     public function students()
     {
+        $this->requireRole([1, 2]);
         $this->render('instructor/students/list');
     }
 
@@ -56,11 +66,13 @@ class InstructorController extends BaseController
     // ===========================
     public function changePassword()
     {
+        $this->requireRole([1, 2]);
         $this->render('instructor/change_password');
     }
 
-    public function updatePassword() {
+    public function updatePassword()
+    {
+        $this->requireRole([1, 2]);
         echo "Đã nhận dữ liệu đổi mật khẩu của giảng viên!";
     }
-
 }
