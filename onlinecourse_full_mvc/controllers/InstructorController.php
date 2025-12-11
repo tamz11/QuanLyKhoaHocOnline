@@ -75,8 +75,4 @@ class InstructorController extends BaseController
         $this->requireRole([1, 2]);
         echo "Đã nhận dữ liệu đổi mật khẩu của giảng viên!";
     }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> ccf1cca4de56872d0fe79081a65aaa13f3aa7f09

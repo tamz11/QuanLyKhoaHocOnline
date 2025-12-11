@@ -37,8 +37,4 @@ class AdminController extends BaseController {
         $this->requireRole([2]);
         echo "Đã nhận dữ liệu đổi mật khẩu của admin!";
     }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> ccf1cca4de56872d0fe79081a65aaa13f3aa7f09
