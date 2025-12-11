@@ -10,33 +10,45 @@ class User {
         $this->conn = $db->connect();
     }
 
-    // GIỮ NGUYÊN — dùng cho login
+    // =============================
+    //  TÌM USER THEO LOGIN
+    // =============================
     public function findByLogin($login) {
         $sql = "SELECT * FROM users 
                 WHERE email = :login OR username = :login
                 LIMIT 1";
+
         $stmt = $this->conn->prepare($sql);
-        $stmt->execute(['login' => $login]);
+
+        // BUG FIX: phải là ':login' chứ không phải 'login'
+        $stmt->execute([':login' => $login]);
+
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    // THÊM — tìm theo email (để kiểm tra khi đăng ký)
+    // =============================
+    //  TÌM THEO EMAIL
+    // =============================
     public function findByEmail($email) {
         $sql = "SELECT * FROM users WHERE email = :email LIMIT 1";
         $stmt = $this->conn->prepare($sql);
-        $stmt->execute(['email' => $email]);
+        $stmt->execute([':email' => $email]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    // THÊM — tìm theo username
+    // =============================
+    //  TÌM THEO USERNAME
+    // =============================
     public function findByUsername($username) {
         $sql = "SELECT * FROM users WHERE username = :username LIMIT 1";
         $stmt = $this->conn->prepare($sql);
-        $stmt->execute(['username' => $username]);
+        $stmt->execute([':username' => $username]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    // THÊM — tạo user (dùng cho đăng ký)
+    // =============================
+    //  TẠO USER MỚI (REGISTER)
+    // =============================
     public function createUser($data) {
         $sql = "INSERT INTO users (username, fullname, email, password, role)
                 VALUES (:username, :fullname, :email, :password, :role)";
@@ -44,22 +56,28 @@ class User {
         return $stmt->execute($data);
     }
 
-    // THÊM — lấy danh sách user (phục vụ admin)
+    // =============================
+    //  LẤY TOÀN BỘ USER (ADMIN)
+    // =============================
     public function getAllUsers() {
         $sql = "SELECT * FROM users ORDER BY id DESC";
         $stmt = $this->conn->query($sql);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    // THÊM — lấy user theo id (khi sửa thông tin)
+    // =============================
+    //  TÌM USER THEO ID
+    // =============================
     public function getUserById($id) {
         $sql = "SELECT * FROM users WHERE id = :id";
         $stmt = $this->conn->prepare($sql);
-        $stmt->execute(['id' => $id]);
+        $stmt->execute([':id' => $id]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    // THÊM — update user (admin dùng để sửa role, fullname)
+    // =============================
+    //  UPDATE THÔNG TIN USER
+    // =============================
     public function updateUser($id, $data) {
         $sql = "UPDATE users 
                 SET username = :username, 
@@ -74,10 +92,25 @@ class User {
         return $stmt->execute($data);
     }
 
-    // THÊM — xoá user
+    // =============================
+    //  XOÁ USER
+    // =============================
     public function deleteUser($id) {
         $sql = "DELETE FROM users WHERE id = :id";
         $stmt = $this->conn->prepare($sql);
-        return $stmt->execute(['id' => $id]);
+        return $stmt->execute([':id' => $id]);
     }
+
+    // =============================
+    //  CẬP NHẬT ROLE USER (ADMIN DUYỆT GIẢNG VIÊN)
+    // =============================
+    public function updateRole($user_id, $role) {
+        $sql = "UPDATE users SET role = :role WHERE id = :id";
+        $stmt = $this->conn->prepare($sql);
+        return $stmt->execute([
+            ':role' => $role,
+            ':id'   => $user_id
+        ]);
+    }
+
 }
