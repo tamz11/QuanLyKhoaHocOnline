@@ -1,5 +1,6 @@
 <?php
 require_once 'BaseController.php';
+require_once __DIR__ . '/../models/InstructorRequest.php';
 
 class StudentController extends BaseController {
 
@@ -32,4 +33,4 @@ class StudentController extends BaseController {
         $this->requireRole([0, 1, 2]);
         $this->render('student/change_password');
     }
-}
+
