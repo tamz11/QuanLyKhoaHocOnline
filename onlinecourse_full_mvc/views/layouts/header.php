@@ -14,7 +14,7 @@ $currentUser = $_SESSION['user'] ?? null;
 <html lang="vi">
 <head>
     <meta charset="utf-8">
-    <title>OnlineCourse - VSchool MVC</title>
+    <title>OnlineCourse - MVC</title>
 
     <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -38,7 +38,7 @@ $currentUser = $_SESSION['user'] ?? null;
 <header class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top shadow-sm">
     <div class="container">
         <a class="navbar-brand fw-bold" href="index.php">
-            <i class="fa-solid fa-graduation-cap me-1"></i> VSchool
+            <i class="fa-solid fa-graduation-cap me-1"></i> OnlineCourse
         </a>
 
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar">

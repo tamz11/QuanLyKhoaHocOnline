@@ -9,7 +9,7 @@
                 opacity: .35;"></div>
 
     <div class="container position-relative py-5 text-center">
-        <h1 class="display-4 fw-bold mb-3">Chào mừng đến với VSchool</h1>
+        <h1 class="display-4 fw-bold mb-3">Chào mừng đến với OnlineCourse</h1>
         <p class="lead mb-4">Học & thực hành các kỹ năng mới với hệ thống khóa học online.</p>
         <a href="index.php?controller=course&action=index" class="btn btn-danger btn-lg">
             Bắt đầu học ngay
@@ -92,7 +92,7 @@
             </div>
             <div class="col-md-5 d-flex align-items-center justify-content-center">
                 <div class="bg-danger text-light p-4 rounded-3 shadow">
-                    <h4 class="mb-1">VSchool</h4>
+                    <h4 class="mb-1">OnlineCourse</h4>
                     <p class="mb-0 small">Tầng 3, Tòa nhà CNTT<br>Đại học Thủy lợi</p>
                 </div>
             </div>
