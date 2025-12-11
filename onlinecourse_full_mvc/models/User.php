@@ -80,4 +80,16 @@ class User {
         $stmt = $this->conn->prepare($sql);
         return $stmt->execute(['id' => $id]);
     }
+    // cập nhật hồ sơ
+    public function updateProfile($id, $fullname, $avatarPath = null) {
+    if ($avatarPath) {
+        $sql = "UPDATE users SET fullname = ?, avatar = ? WHERE id = ?";
+        $stmt = $this->conn->prepare($sql);
+        return $stmt->execute([$fullname, $avatarPath, $id]);
+    } else {
+        $sql = "UPDATE users SET fullname = ? WHERE id = ?";
+        $stmt = $this->conn->prepare($sql);
+        return $stmt->execute([$fullname, $id]);
+    }
+}
 }
