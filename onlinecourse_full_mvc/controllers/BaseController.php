@@ -32,4 +32,8 @@ abstract class BaseController {
             die("Bạn không có quyền truy cập trang này!");
         }
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> ccf1cca4de56872d0fe79081a65aaa13f3aa7f09

@@ -168,4 +168,8 @@ class AuthController extends BaseController {
         session_destroy();
         $this->redirect("index.php?controller=auth&action=login");
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> ccf1cca4de56872d0fe79081a65aaa13f3aa7f09
