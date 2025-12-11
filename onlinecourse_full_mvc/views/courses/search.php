@@ -2,7 +2,7 @@
 $pageTitle = "Kết quả tìm kiếm";
 include_once __DIR__ . '/../layouts/header.php';
 ?>
-
+<div class="container py-5">
 <h1 class="h4 mb-3">Kết quả tìm kiếm: “<?= htmlspecialchars($keyword) ?>”</h1>
 
 <div class="row g-3">
@@ -10,27 +10,19 @@ include_once __DIR__ . '/../layouts/header.php';
 <?php foreach ($results as $course): ?>
     <div class="col-12 col-sm-6 col-lg-3">
         <div class="card h-100 border-0 shadow-sm course-card">
-            <img src="<?= $course['image'] ?: '/assets/img/course-placeholder.jpg' ?>"
-                 class="card-img-top">
-
+            <img src="assets/uploads/courses/<?= htmlspecialchars($course['image']) ?>"
+                    class="card-img-top"
+                    alt="<?= htmlspecialchars($course['title']) ?>">
             <div class="card-body d-flex flex-column">
-                <h5 class="card-title text-truncate"><?= htmlspecialchars($course['title']) ?></h5>
-
-                <small class="text-muted mb-2 text-truncate"><?= $course['instructor_name'] ?></small>
-
-                <p class="small text-muted flex-grow-1">
-                    <?= htmlspecialchars(mb_strimwidth($course['description'], 0, 60, '...')) ?>
+                <h5 class="card-title"><?= htmlspecialchars($course['title']) ?></h5>
+                <p class="small text-muted mb-2">
+                    Cấp độ: <?= htmlspecialchars($course['level']) ?>
                 </p>
-
-                <div class="d-flex justify-content-between align-items-center mt-2">
-                    <strong class="text-primary">
-                        <?= $course['price'] > 0 ? number_format($course['price']) . "đ" : "Miễn phí" ?>
-                    </strong>
-
-                    <a href="/courses/detail/<?= $course['id'] ?>" class="btn btn-sm btn-outline-primary">
-                        Xem
-                    </a>
-                </div>
+                <p class="mb-2">
+                    <span class="fw-bold text-danger"><?= number_format($course['price']) . "đ" ?></span>
+                </p>
+                <a href="index.php?controller=course&action=detail&id=<?= $course['id'] ?>"
+                    class="btn btn-primary btn-sm mt-auto">Xem khóa học</a>
             </div>
         </div>
     </div>
@@ -42,6 +34,7 @@ include_once __DIR__ . '/../layouts/header.php';
     </div>
 <?php endif; ?>
 
+</div>
 </div>
 
 <?php include __DIR__ . '/../layouts/footer.php'; ?>

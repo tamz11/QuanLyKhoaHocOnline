@@ -80,4 +80,8 @@ class User {
         $stmt = $this->conn->prepare($sql);
         return $stmt->execute(['id' => $id]);
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> ccf1cca4de56872d0fe79081a65aaa13f3aa7f09

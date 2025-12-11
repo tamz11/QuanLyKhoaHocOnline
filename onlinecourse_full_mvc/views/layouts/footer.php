@@ -6,7 +6,7 @@
             <div class="col-md-4">
                 <h5>Về chúng tôi</h5>
                 <p class="small mb-1">
-                    VSchool cung cấp nền tảng học trực tuyến cho sinh viên & giảng viên CNTT.
+                    OnlineCourse cung cấp nền tảng học trực tuyến cho sinh viên & giảng viên CNTT.
                 </p>
                 <div class="d-flex gap-2">
                     <a href="#" class="btn btn-outline-light btn-sm"><i class="fa-brands fa-facebook"></i></a>
@@ -26,8 +26,8 @@
             <div class="col-md-4">
                 <h5>Liên hệ</h5>
                 <p class="small mb-0">
-                    VSchool - Trường Đại học Thủy lợi<br>
-                    Email: support@vschool.com<br>
+                    OnlineCourse - Trường Đại học Thủy lợi<br>
+                    Email: support@OnlineCourse.com<br>
                     Phone: +84 123 456 789
                 </p>
             </div>
@@ -35,10 +35,7 @@
 
         <hr class="border-secondary my-3">
 
-        <div class="d-flex justify-content-between small">
-            <span>Copyright © 2025 | Thiết kế bởi nhóm CSE485</span>
-            <a href="index.php?controller=auth&action=loginAdmin" class="link-light small">Đăng nhập Admin</a>
-        </div>
+        
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

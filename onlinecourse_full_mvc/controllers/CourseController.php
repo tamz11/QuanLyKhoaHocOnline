@@ -1,17 +1,70 @@
 <?php
 require_once 'BaseController.php';
+require_once __DIR__ . '/../models/Course.php';
+require_once __DIR__ . '/../models/Category.php';
+require_once __DIR__ . '/../models/Lesson.php';
 
 class CourseController extends BaseController {
 
+    private $courseModel;
+    private $categoryModel;
+    private $lessonModel;
+
+    public function __construct() {
+        $this->courseModel = new Course();
+        $this->categoryModel = new Category();
+        $this->lessonModel  = new Lesson();
+    }
+
+    /* ================================
+       TRANG DANH SÁCH KHÓA HỌC
+       (Có lọc theo danh mục)
+    ================================= */
     public function index() {
-        $this->render('courses/index');
+        $category = $_GET['category'] ?? null;
+
+        if ($category) {
+            $courses = $this->courseModel->getByCategory($category);
+        } else {
+            // Lấy tất cả khóa học có giảng viên
+            $courses = $this->courseModel->getAll();
+        }
+
+        $categories = $this->categoryModel->getAll();
+
+        $this->render('courses/index', [
+            'courses' => $courses,
+            'categories' => $categories
+        ]);
     }
 
-    public function detail() {
-        $this->render('courses/detail');
-    }
 
+    /* ================================
+       TÌM KIẾM KHÓA HỌC
+    ================================= */
     public function search() {
-        $this->render('courses/search');
+        $keyword = $_GET['q'] ?? '';
+
+        $results = $this->courseModel->search($keyword);
+
+        $this->render('courses/search', [
+            'results' => $results,
+            'keyword' => $keyword
+        ]);
+    }
+
+    /* ================================
+       TRANG CHI TIẾT KHÓA HỌC
+    ================================= */
+    public function detail() {
+        $id = $_GET['id'] ?? 0;
+
+        $course = $this->courseModel->findById($id);
+        $lessons = $this->lessonModel->getByCourse($id);
+
+        $this->render('courses/detail', [
+            'course' => $course,
+            'lessons' => $lessons
+        ]);
     }
 }

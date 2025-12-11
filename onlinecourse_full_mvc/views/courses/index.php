@@ -12,9 +12,18 @@
     <!-- sau này controller truyền $categories -->
     <!-- Lọc theo danh mục -->
     <div class="mb-4">
-        <a href="index.php?controller=course&action=index" class="badge bg-secondary text-decoration-none me-1">Tất cả</a>
-        <!-- foreach categories -->
-        <!-- <a href="...&category=1" class="badge bg-outline-primary me-1">Web Development</a> -->
+        <a href="index.php?controller=course&action=index"
+        class="badge bg-primary text-decoration-none me-1 <?= empty($_GET['category']) ? 'bg-primary' : 'bg-secondary' ?>">
+            Tất cả
+        </a>
+
+        <?php foreach ($categories as $cat): ?>
+            <a href="index.php?controller=course&action=index&category=<?= $cat['id'] ?>"
+            class="badge text-decoration-none me-1 
+                    <?= (($_GET['category'] ?? '') == $cat['id']) ? 'bg-primary' : 'bg-secondary' ?>">
+                <?= htmlspecialchars($cat['name']) ?>
+            </a>
+        <?php endforeach; ?>
     </div>
 
     <!-- Grid khoá học -->
@@ -27,13 +36,15 @@
                              class="card-img-top"
                              alt="<?= htmlspecialchars($course['title']) ?>">
                         <div class="card-body d-flex flex-column">
-                            <h6 class="card-title"><?= htmlspecialchars($course['title']) ?></h6>
+                            <h5 class="card-title"><?= htmlspecialchars($course['title']) ?></h5>
+                            <p class="small text-muted mb-2">
+                                Giảng viên: <?= htmlspecialchars($course['instructor_name']) ?>
+                            </p>
                             <p class="small text-muted mb-2">
                                 Cấp độ: <?= htmlspecialchars($course['level']) ?>
                             </p>
                             <p class="mb-2">
-                                <span class="text-muted text-decoration-line-through me-1">$<?= $course['old_price'] ?? '' ?></span>
-                                <span class="fw-bold text-danger">$<?= $course['price'] ?></span>
+                                <span class="fw-bold text-danger"><?= number_format($course['price']) . "đ" ?></span>
                             </p>
                             <a href="index.php?controller=course&action=detail&id=<?= $course['id'] ?>"
                                class="btn btn-primary btn-sm mt-auto">Xem khóa học</a>
