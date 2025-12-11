@@ -8,11 +8,12 @@
         <div class="col-md-8">
             <h2><?= htmlspecialchars($course['title']) ?></h2>
             <p class="text-muted"><?= htmlspecialchars($course['description']) ?></p>
+            <p class="mb-1"><strong>Giảng viên:</strong> <?= htmlspecialchars($course['instructor']) ?></p>
+
             <p class="mb-1"><strong>Thời lượng:</strong> <?= $course['duration_weeks'] ?> tuần</p>
             <p class="mb-1"><strong>Cấp độ:</strong> <?= htmlspecialchars($course['level']) ?></p>
             <p class="mb-3">
-                <span class="text-muted text-decoration-line-through me-2">$<?= $course['old_price'] ?? '' ?></span>
-                <span class="fw-bold text-danger h5 mb-0">$<?= $course['price'] ?></span>
+                <span class="fw-bold text-danger h5 mb-0"><?= number_format($course['price']) . "đ" ?></span>
             </p>
 
             <a href="index.php?controller=enrollment&action=checkout&course_id=<?= $course['id'] ?>"
