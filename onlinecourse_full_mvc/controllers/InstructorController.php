@@ -611,7 +611,7 @@ class InstructorController extends BaseController
         // Lấy thông tin học viên
         require_once 'models/User.php';
         $userModel = new User();
-        $student = $userModel->findById($studentId);
+        $student = $userModel->getUserById($studentId);
 
         // Lấy lessons của khóa học để hiển thị tiến độ
         $lessonModel = new Lesson();
@@ -624,8 +624,12 @@ class InstructorController extends BaseController
 
         // Tạo map để dễ kiểm tra
         $progressMap = [];
+        $completionDates = [];
         foreach ($lessonProgresses as $lp) {
             $progressMap[$lp['lesson_id']] = $lp['completed'];
+            if ($lp['completed']) {
+                $completionDates[$lp['lesson_id']] = date('d/m/Y', strtotime($lp['created_at']));
+            }
         }
 
         $this->render('instructor/students/progress', [
@@ -633,7 +637,8 @@ class InstructorController extends BaseController
             'student' => $student,
             'enrollment' => $enrollment,
             'lessons' => $lessons,
-            'progressMap' => $progressMap
+            'progressMap' => $progressMap,
+            'completionDates' => $completionDates
         ]);
     }
 
