@@ -72,6 +72,8 @@ class Course {
                     c.id,
                     c.title,
                     c.description,
+                    c.category_id,
+                    c.instructor_id,
                     c.duration_weeks,
                     c.level,
                     c.price,
@@ -142,7 +144,55 @@ class Course {
         return $this->pdo->query($sql)->fetchAll();
     }
 
+    /* ============================
+       CRUD CHO GIẢNG VIÊN
+    ============================= */
+    public function getByInstructor($instructorId) {
+        $sql = "SELECT c.*, cat.name AS category_name
+                FROM courses c
+                LEFT JOIN categories cat ON c.category_id = cat.id
+                WHERE c.instructor_id = ?
+                ORDER BY c.id DESC";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([$instructorId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 
+    public function create($data, $instructorId) {
+        $sql = "INSERT INTO courses (title, description, category_id, instructor_id, duration_weeks, level, price, image, approved)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0)";
+        $stmt = $this->pdo->prepare($sql);
+        return $stmt->execute([
+            $data['title'],
+            $data['description'],
+            $data['category_id'],
+            $instructorId,
+            $data['duration_weeks'],
+            $data['level'],
+            $data['price'],
+            $data['image'] ?? null
+        ]);
+    }
 
+    public function update($id, $data) {
+        $sql = "UPDATE courses SET title = ?, description = ?, category_id = ?, duration_weeks = ?, level = ?, price = ?, image = ? WHERE id = ?";
+        $stmt = $this->pdo->prepare($sql);
+        return $stmt->execute([
+            $data['title'],
+            $data['description'],
+            $data['category_id'],
+            $data['duration_weeks'],
+            $data['level'],
+            $data['price'],
+            $data['image'] ?? null,
+            $id
+        ]);
+    }
 
-}
+    public function delete($id) {
+        $sql = "DELETE FROM courses WHERE id = ?";
+        $stmt = $this->pdo->prepare($sql);
+        return $stmt->execute([$id]);
+    }
+
+} 

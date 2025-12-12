@@ -4,17 +4,8 @@
 
     <div class="card shadow-sm">
         <div class="card-body">
-            <form method="post">
-                <div class="mb-3">
-                    <label class="form-label">Thuộc khóa học</label>
-                    <select name="course_id" class="form-select" required>
-                        <?php foreach ($courses as $c): ?>
-                            <option value="<?= $c['id'] ?>">
-                                <?= htmlspecialchars($c['title']) ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
+            <form method="post" action="index.php?controller=instructor&action=storeLesson">
+                <input type="hidden" name="course_id" value="<?= $course['id'] ?>">
 
                 <div class="mb-3">
                     <label class="form-label">Tiêu đề bài giảng</label>

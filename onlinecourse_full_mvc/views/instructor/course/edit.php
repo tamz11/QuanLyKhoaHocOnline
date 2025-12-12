@@ -1,11 +1,11 @@
-<?php include __DIR__ . '/../../layouts/header.php'; ?>
+
 <?php include __DIR__ . '/../../layouts/instructor_sidebar.php';// Nếu bạn có sidebar riêng cho giảng viên thì include thêm ở đây ?>
 <div class="container py-4">
     <h2 class="mb-4">✏ Chỉnh sửa khóa học</h2>
 
     <div class="card shadow-sm">
         <div class="card-body">
-            <form method="post" enctype="multipart/form-data">
+            <form method="post" action="index.php?controller=instructor&action=updateCourse&id=<?= $course['id'] ?>" enctype="multipart/form-data">
                 <div class="mb-3">
                     <label class="form-label">Tên khóa học</label>
                     <input type="text"

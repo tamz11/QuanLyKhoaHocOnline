@@ -34,3 +34,4 @@ class StudentController extends BaseController {
         $this->render('student/change_password');
     }
 
+}
