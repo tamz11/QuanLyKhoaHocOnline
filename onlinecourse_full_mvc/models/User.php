@@ -36,15 +36,6 @@ class User {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    // =============================
-    //  TÌM THEO USERNAME
-    // =============================
-    public function findByUsername($username) {
-        $sql = "SELECT * FROM users WHERE username = :username LIMIT 1";
-        $stmt = $this->conn->prepare($sql);
-        $stmt->execute([':username' => $username]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
-    }
 
     // =============================
     //  TẠO USER MỚI (REGISTER)
@@ -111,6 +102,16 @@ class User {
             ':role' => $role,
             ':id'   => $user_id
         ]);
+    }
+
+    // =============================
+    //  TÌM THEO ID
+    // =============================
+    public function findById($id) {
+        $sql = "SELECT * FROM users WHERE id = :id LIMIT 1";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute([':id' => $id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
 }

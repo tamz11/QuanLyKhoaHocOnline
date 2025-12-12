@@ -1,5 +1,25 @@
 <?php include __DIR__ . '/../../layouts/instructor_sidebar.php'; ?>
 
+<?php if (isset($_GET['success'])): ?>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <?php if ($_GET['success'] == 1): ?>
+            Bài học đã được tạo thành công!
+        <?php elseif ($_GET['success'] == 2): ?>
+            Bài học đã được cập nhật thành công!
+        <?php elseif ($_GET['success'] == 3): ?>
+            Bài học đã được xóa thành công!
+        <?php endif; ?>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+<?php endif; ?>
+
+<?php if (isset($_GET['error'])): ?>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        Có lỗi xảy ra. Vui lòng thử lại!
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+<?php endif; ?>
+
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h3 class="mb-0">Quản lý bài học - <?= htmlspecialchars($course['title']) ?></h3>
     <a href="index.php?controller=instructor&action=createLesson&course_id=<?= $course['id'] ?>" class="btn btn-success">

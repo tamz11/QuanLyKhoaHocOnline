@@ -1,10 +1,10 @@
-<?php include __DIR__ . '/../../layouts/header.php'; ?>
+
 <div class="container py-4">
     <h2 class="mb-4">✏ Chỉnh sửa bài giảng</h2>
 
     <div class="card shadow-sm">
         <div class="card-body">
-            <form method="post">
+            <form method="post" action="index.php?controller=instructor&action=updateLesson&id=<?= $lesson['id'] ?>">
                 <div class="mb-3">
                     <label class="form-label">Thuộc khóa học</label>
                     <select name="course_id" class="form-select" disabled>
