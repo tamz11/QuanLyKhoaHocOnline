@@ -649,6 +649,46 @@ class InstructorController extends BaseController
     public function updatePassword()
     {
         $this->requireRole([1, 2]);
-        echo "Đã nhận dữ liệu đổi mật khẩu của giảng viên!";
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: index.php?controller=instructor&action=changePassword');
+            exit;
+        }
+
+        $currentPassword = $_POST['current_password'] ?? '';
+        $newPassword = $_POST['new_password'] ?? '';
+        $newPasswordConfirmation = $_POST['new_password_confirmation'] ?? '';
+
+        // Validate input
+        if (empty($currentPassword) || empty($newPassword) || empty($newPasswordConfirmation)) {
+            $this->render('instructor/change_password', ['error' => 'Vui lòng điền đầy đủ thông tin.']);
+            return;
+        }
+
+        if ($newPassword !== $newPasswordConfirmation) {
+            $this->render('instructor/change_password', ['error' => 'Mật khẩu mới và xác nhận không khớp.']);
+            return;
+        }
+
+        if (strlen($newPassword) < 6) {
+            $this->render('instructor/change_password', ['error' => 'Mật khẩu mới phải có ít nhất 6 ký tự.']);
+            return;
+        }
+
+        // Kiểm tra mật khẩu hiện tại
+        require_once 'models/User.php';
+        $userModel = new User();
+        $user = $userModel->getUserById($this->currentUser['id']);
+        if (!$user || !password_verify($currentPassword, $user['password'])) {
+            $this->render('instructor/change_password', ['error' => 'Mật khẩu hiện tại không đúng.']);
+            return;
+        }
+
+        // Cập nhật mật khẩu mới
+        if ($userModel->updatePassword($this->currentUser['id'], $newPassword)) {
+            $this->render('instructor/change_password', ['success' => 'Mật khẩu đã được cập nhật thành công.']);
+        } else {
+            $this->render('instructor/change_password', ['error' => 'Có lỗi xảy ra. Vui lòng thử lại.']);
+        }
     }
 }

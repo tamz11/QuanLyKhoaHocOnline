@@ -105,13 +105,16 @@ class User {
     }
 
     // =============================
-    //  TÌM THEO ID
+    //  CẬP NHẬT MẬT KHẨU
     // =============================
-    public function findById($id) {
-        $sql = "SELECT * FROM users WHERE id = :id LIMIT 1";
+    public function updatePassword($id, $newPassword) {
+        $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+        $sql = "UPDATE users SET password = :password WHERE id = :id";
         $stmt = $this->conn->prepare($sql);
-        $stmt->execute([':id' => $id]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        return $stmt->execute([
+            ':password' => $hashedPassword,
+            ':id' => $id
+        ]);
     }
 
 }
