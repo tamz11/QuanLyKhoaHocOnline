@@ -1,21 +1,32 @@
-<?php
-// views/layouts/admin_sidebar.php
-
-// Lấy dữ liệu người dùng hiện tại từ session
-$currentUser = $_SESSION['user'] ?? [];
-
-// Avatar admin
-$avatar = $currentUser['avatar'] ?? 'default-admin.png';
-?>
-
 <div class="container-fluid py-4">
     <div class="row">
 
         <!-- SIDEBAR -->
         <aside class="col-md-3 col-lg-2 mb-4">
-
             <div class="card shadow-sm">
                 <div class="card-body text-center">
+
+                    <?php 
+                        // Lấy thông tin admin đang đăng nhập
+                        $currentAdmin = $_SESSION['user'] ?? null;
+                    ?>
+
+                    <!-- Avatar -->
+                    <img src="assets/uploads/avatars/<?= htmlspecialchars($currentAdmin['avatar'] ?? 'default-admin.png') ?>"
+                         class="rounded-circle mb-3"
+                         width="80"
+                         height="80"
+                         alt="Admin">
+
+                    <!-- Fullname -->
+                    <h6 class="mb-0">
+                        <?= htmlspecialchars($currentAdmin['fullname'] ?? 'Quản trị viên') ?>
+                    </h6>
+
+                    <!-- Email -->
+                    <p class="text-muted small mb-0">
+                        <?= htmlspecialchars($currentAdmin['email'] ?? '') ?>
+                    </p>
 
                 </div>
             </div>
@@ -46,11 +57,16 @@ $avatar = $currentUser['avatar'] ?? 'default-admin.png';
                     <i class="fa-solid fa-check me-2"></i> Duyệt khóa học mới
                 </a>
 
+                <!-- Link duyệt yêu cầu giảng viên -->
+                <a href="index.php?controller=admin&action=instructorRequests"
+                   class="list-group-item list-group-item-action 
+                   <?= ($_GET['action'] ?? '') === 'instructorRequests' ? 'active' : '' ?>">
+                    <i class="fa-solid fa-user-check me-2"></i> Duyệt yêu cầu giảng viên
+                </a>
 
                 <a href="index.php?controller=admin&action=changePassword"
-                   class="list-group-item list-group-item-action 
-                   <?= ($_GET['action'] ?? '') === 'changePassword' ? 'active' : '' ?>">
-                    <i class="fa-solid fa-key me-2"></i> Thay đổi mật khẩu
+                    class="list-group-item list-group-item-action <?= ($_GET['action'] ?? '') === 'changePassword' ? 'active' : '' ?>">
+                    <i class="fa-solid fa-key me-2"></i>Thay đổi mật khẩu
                 </a>
 
                 <a href="index.php?controller=auth&action=logout"
@@ -58,7 +74,6 @@ $avatar = $currentUser['avatar'] ?? 'default-admin.png';
                     <i class="fa-solid fa-right-from-bracket me-2"></i> Đăng xuất
                 </a>
             </div>
-
         </aside>
 
         <!-- MAIN CONTENT -->
