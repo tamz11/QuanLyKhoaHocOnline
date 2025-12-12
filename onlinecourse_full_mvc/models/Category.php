@@ -19,6 +19,11 @@ class Category {
         return $this->pdo->query($sql)->fetchAll();
     }
 
+    // ⭐ THÊM MỚI — HÀM all() CHO ADMINCONTROLLER
+    public function all() {
+        return $this->getAll();
+    }
+
     public function create($name, $description) {
         $sql = "INSERT INTO categories (name, description) VALUES (?, ?)";
         $stmt = $this->pdo->prepare($sql);
