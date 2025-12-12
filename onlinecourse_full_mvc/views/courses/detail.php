@@ -15,9 +15,22 @@
             <p class="mb-3">
                 <span class="fw-bold text-danger h5 mb-0"><?= number_format($course['price']) . "đ" ?></span>
             </p>
+            <?php if ($isEnrolled): ?>
 
-            <a href="index.php?controller=enrollment&action=checkout&course_id=<?= $course['id'] ?>"
-               class="btn btn-primary btn-lg">Mua ngay</a>
+                <button class="btn btn-secondary btn-lg" disabled>
+                    Đã đăng ký
+                </button>
+
+            <?php else: ?>
+
+                <a href="index.php?controller=enrollment&action=enroll&course_id=<?= $course['id'] ?>"
+                class="btn btn-primary btn-lg">
+                Đăng ký học
+                </a>
+
+            <?php endif; ?>
+
+
         </div>
     </div>
 

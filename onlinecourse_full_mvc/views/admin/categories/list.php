@@ -1,4 +1,4 @@
-<?php include __DIR__ . '/../../layouts/admin_sidebar.php'; ?>
+
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h3 class="mb-0">Danh mục khóa học</h3>

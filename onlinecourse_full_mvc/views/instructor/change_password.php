@@ -1,5 +1,19 @@
 <?php include __DIR__ . '/../layouts/instructor_sidebar.php'; ?>
 
+<?php if (isset($success)): ?>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <?= htmlspecialchars($success) ?>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+<?php endif; ?>
+
+<?php if (isset($error)): ?>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <?= htmlspecialchars($error) ?>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+<?php endif; ?>
+
 <h3 class="mb-4">Thay đổi mật khẩu</h3>
 
 <form method="post" 

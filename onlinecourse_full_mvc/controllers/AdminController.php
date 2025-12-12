@@ -48,7 +48,6 @@ class AdminController extends BaseController {
     // Danh sách yêu cầu giảng viên
     public function instructorRequests() {
         $this->requireRole([2]);
-
         require_once __DIR__ . '/../models/InstructorRequest.php';
         $requestModel = new InstructorRequest();
 
@@ -194,3 +193,4 @@ class AdminController extends BaseController {
     }
 
 }
+

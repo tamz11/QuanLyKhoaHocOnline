@@ -1,5 +1,25 @@
 <?php include __DIR__ . '/../layouts/instructor_sidebar.php'; ?>
 
+<?php if (isset($_GET['success'])): ?>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <?php if ($_GET['success'] == 1): ?>
+            Khóa học đã được tạo thành công!
+        <?php elseif ($_GET['success'] == 2): ?>
+            Khóa học đã được cập nhật thành công!
+        <?php elseif ($_GET['success'] == 3): ?>
+            Khóa học đã được xóa thành công!
+        <?php endif; ?>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+<?php endif; ?>
+
+<?php if (isset($_GET['error'])): ?>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        Có lỗi xảy ra. Vui lòng thử lại!
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+<?php endif; ?>
+
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h3 class="mb-0">Khoá học của tôi</h3>
     <a href="index.php?controller=instructor&action=createCourse"
@@ -25,17 +45,13 @@
                 <td><?= $course['id'] ?></td>
                 <td><?= htmlspecialchars($course['title']) ?></td>
                 <td><?= htmlspecialchars($course['category_name']) ?></td>
-                <td>$<?= $course['price'] ?></td>
+                <td><?= number_format($course['price']) ?>đ</td>
                 <td><?= htmlspecialchars($course['level']) ?></td>
                 <td><?= htmlspecialchars($course['status'] ?? 'Đã duyệt') ?></td>
                 <td class="text-end">
                     <a href="index.php?controller=instructor&action=editCourse&id=<?= $course['id'] ?>"
                        class="btn btn-sm btn-outline-primary">
                         <i class="fa-solid fa-pen"></i>
-                    </a>
-                    <a href="index.php?controller=instructor&action=manageLessons&course_id=<?= $course['id'] ?>"
-                       class="btn btn-sm btn-outline-secondary">
-                        Bài giảng
                     </a>
                     <a href="index.php?controller=instructor&action=deleteCourse&id=<?= $course['id'] ?>"
                        class="btn btn-sm btn-outline-danger"

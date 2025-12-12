@@ -1,6 +1,10 @@
 <?php include __DIR__ . '/../layouts/student_sidebar.php'; ?>
 
 <h3 class="mb-4">Trang cá nhân học viên</h3>
+<?php if (!empty($_SESSION['msg'])): ?>
+    <div class="alert alert-success"><?= $_SESSION['msg']; ?></div>
+    <?php unset($_SESSION['msg']); ?>
+<?php endif; ?>
 
 <div class="row g-3">
     <div class="col-md-4">
@@ -36,7 +40,7 @@
 <hr class="my-4">
 
 <h5>Thông tin tài khoản</h5>
-<form method="post" action="index.php?controller=student&action=updateProfile" enctype="multipart/form-data" class="row g-3">
+<form method="post" action="index.php?controller=user&action=updateProfile" enctype="multipart/form-data" class="row g-3">
     <div class="col-md-6">
         <label class="form-label">Họ & tên</label>
         <input type="text" name="fullname" class="form-control"
@@ -59,4 +63,3 @@
     </div>
 </form>
 
-<?php include __DIR__ . '/../layouts/student_sidebar_end.php'; // hoặc đóng section/row/container như đã nói ?>

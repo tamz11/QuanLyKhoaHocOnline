@@ -3,27 +3,32 @@
 
         <!-- SIDEBAR -->
         <aside class="col-md-3 col-lg-2 mb-4">
+
+            <!-- FIX KHÔNG XUỐNG DÒNG -->
+            <style>
+                .list-group-item {
+                    white-space: nowrap !important;
+                }
+            </style>
+
             <div class="card shadow-sm">
                 <div class="card-body text-center">
 
                     <?php 
-                        // Lấy thông tin admin đang đăng nhập
-                        $currentAdmin = $_SESSION['user'] ?? null;
+                        $currentAdmin = $currentUser ?? ($_SESSION['user'] ?? null);
+                        $avatarFile = $currentAdmin['avatar'] ?? 'default-admin.png';
                     ?>
 
-                    <!-- Avatar -->
-                    <img src="assets/uploads/avatars/<?= htmlspecialchars($currentAdmin['avatar'] ?? 'default-admin.png') ?>"
+                    <img src="assets/uploads/avatars/<?= htmlspecialchars($avatarFile) ?>"
                          class="rounded-circle mb-3"
-                         width="80"
-                         height="80"
-                         alt="Admin">
+                         width="96"
+                         height="96"
+                         alt="Admin Avatar">
 
-                    <!-- Fullname -->
                     <h6 class="mb-0">
                         <?= htmlspecialchars($currentAdmin['fullname'] ?? 'Quản trị viên') ?>
                     </h6>
 
-                    <!-- Email -->
                     <p class="text-muted small mb-0">
                         <?= htmlspecialchars($currentAdmin['email'] ?? '') ?>
                     </p>
@@ -57,7 +62,6 @@
                     <i class="fa-solid fa-check me-2"></i> Duyệt khóa học mới
                 </a>
 
-                <!-- Link duyệt yêu cầu giảng viên -->
                 <a href="index.php?controller=admin&action=instructorRequests"
                    class="list-group-item list-group-item-action 
                    <?= ($_GET['action'] ?? '') === 'instructorRequests' ? 'active' : '' ?>">
@@ -65,16 +69,12 @@
                 </a>
 
                 <a href="index.php?controller=admin&action=changePassword"
-                    class="list-group-item list-group-item-action <?= ($_GET['action'] ?? '') === 'changePassword' ? 'active' : '' ?>">
-                    <i class="fa-solid fa-key me-2"></i>Thay đổi mật khẩu
+                   class="list-group-item list-group-item-action 
+                   <?= ($_GET['action'] ?? '') === 'changePassword' ? 'active' : '' ?>">
+                    <i class="fa-solid fa-key me-2"></i> Thay đổi mật khẩu
                 </a>
 
-                <a href="index.php?controller=auth&action=logout"
-                   class="list-group-item list-group-item-action text-danger">
-                    <i class="fa-solid fa-right-from-bracket me-2"></i> Đăng xuất
-                </a>
             </div>
         </aside>
 
-        <!-- MAIN CONTENT -->
         <section class="col-md-9 col-lg-10">
