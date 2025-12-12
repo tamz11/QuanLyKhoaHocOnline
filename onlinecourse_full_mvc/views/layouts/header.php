@@ -1,14 +1,17 @@
 <?php
-$currentPage = $_GET['controller'] ?? 'home';
-?>
-
-<?php
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+// NGĂN TRÌNH DUYỆT LẤY TRANG CŨ RA (Fix back after logout)
+header("Cache-Control: no-cache, no-store, must-revalidate"); 
+header("Pragma: no-cache");
+header("Expires: 0");
+
+$currentPage = $_GET['controller'] ?? 'home';
 $currentUser = $_SESSION['user'] ?? null;
 ?>
+
 
 <!doctype html>
 <html lang="vi">
@@ -111,4 +114,20 @@ $currentUser = $_SESSION['user'] ?? null;
 </header>
 
 <main class="flex-shrink-0">
+<?php
+// Hiện nút quay lại nếu KHÔNG ở trang chủ
+
+$isHomePage = ($_GET['controller'] ?? '') === '' && ($_GET['action'] ?? '') === '';
+
+if (!$isHomePage):
+?>
+<div class="container mt-3">
+    <a href="javascript:history.back()" 
+       class="d-inline-flex align-items-center text-decoration-none"
+       style="font-weight:600; color:#444;">
+        <i class="fa-solid fa-chevron-left me-2"></i> Quay lại
+    </a>
+</div>
+<?php endif; ?>
+
 

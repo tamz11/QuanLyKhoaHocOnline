@@ -164,8 +164,24 @@ class AuthController extends BaseController {
     // ============================
     //  ĐĂNG XUẤT
     // ============================
-    public function logout() {
-        session_destroy();
-        $this->redirect("index.php?controller=auth&action=login");
+public function logout() {
+    // Xóa toàn bộ session
+    session_unset();
+    session_destroy();
+
+    // Xóa session cookie để đảm bảo logout thật sự
+    if (ini_get("session.use_cookies")) {
+        $params = session_get_cookie_params();
+        setcookie(session_name(), '', time() - 42000,
+            $params["path"], $params["domain"],
+            $params["secure"], $params["httponly"]
+        );
     }
+
+    // Chuyển hướng về login
+    header("Location: index.php?controller=auth&action=login");
+    exit;
+}
+
+
 }

@@ -10,9 +10,13 @@ class User {
         $this->conn = $db->connect();
     }
 
-    // =============================
-    //  TÌM USER THEO LOGIN
-    // =============================
+    /* ============================================================
+       💠 1. CHỨC NĂNG CHUNG
+       ============================================================ */
+
+    /**
+     * Tìm user theo email hoặc username (dùng cho login)
+     */
     public function findByLogin($login) {
         $sql = "SELECT * FROM users 
                 WHERE email = :login OR username = :login
@@ -20,15 +24,15 @@ class User {
 
         $stmt = $this->conn->prepare($sql);
 
-        // BUG FIX: phải là ':login' chứ không phải 'login'
+        // BUGFIX: phải dùng ':login'
         $stmt->execute([':login' => $login]);
 
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    // =============================
-    //  TÌM THEO EMAIL
-    // =============================
+    /**
+     * Tìm user theo email
+     */
     public function findByEmail($email) {
         $sql = "SELECT * FROM users WHERE email = :email LIMIT 1";
         $stmt = $this->conn->prepare($sql);
@@ -36,29 +40,29 @@ class User {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-
-    // =============================
-    //  TẠO USER MỚI (REGISTER)
-    // =============================
+    /**
+     * Tạo user mới (đăng ký tài khoản)
+     */
     public function createUser($data) {
         $sql = "INSERT INTO users (username, fullname, email, password, role)
                 VALUES (:username, :fullname, :email, :password, :role)";
+
         $stmt = $this->conn->prepare($sql);
         return $stmt->execute($data);
     }
 
-    // =============================
-    //  LẤY TOÀN BỘ USER (ADMIN)
-    // =============================
+    /**
+     * Lấy danh sách toàn bộ user (Admin)
+     */
     public function getAllUsers() {
         $sql = "SELECT * FROM users ORDER BY id DESC";
         $stmt = $this->conn->query($sql);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    // =============================
-    //  TÌM USER THEO ID
-    // =============================
+    /**
+     * Lấy user theo ID
+     */
     public function getUserById($id) {
         $sql = "SELECT * FROM users WHERE id = :id";
         $stmt = $this->conn->prepare($sql);
@@ -66,9 +70,9 @@ class User {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    // =============================
-    //  UPDATE THÔNG TIN USER
-    // =============================
+    /**
+     * Cập nhật thông tin user (Admin sửa)
+     */
     public function updateUser($id, $data) {
         $sql = "UPDATE users 
                 SET username = :username, 
@@ -79,22 +83,46 @@ class User {
 
         $stmt = $this->conn->prepare($sql);
         $data['id'] = $id;
-
         return $stmt->execute($data);
     }
 
-    // =============================
-    //  XOÁ USER
-    // =============================
+    /**
+     * Xoá user
+     */
     public function deleteUser($id) {
         $sql = "DELETE FROM users WHERE id = :id";
         $stmt = $this->conn->prepare($sql);
         return $stmt->execute([':id' => $id]);
     }
 
-    // =============================
-    //  CẬP NHẬT ROLE USER (ADMIN DUYỆT GIẢNG VIÊN)
-    // =============================
+
+    /* ============================================================
+       💠 2. CHỨC NĂNG CHO HỌC VIÊN (Student)
+       ============================================================ */
+
+    /**
+     * cập nhật hồ sơ cá nhân (fullname + avatar)
+     */
+    public function updateProfile($id, $fullname, $avatarPath = null) {
+        if ($avatarPath) {
+            $sql = "UPDATE users SET fullname = ?, avatar = ? WHERE id = ?";
+            $stmt = $this->conn->prepare($sql);
+            return $stmt->execute([$fullname, $avatarPath, $id]);
+        } else {
+            $sql = "UPDATE users SET fullname = ? WHERE id = ?";
+            $stmt = $this->conn->prepare($sql);
+            return $stmt->execute([$fullname, $id]);
+        }
+    }
+
+
+    /* ============================================================
+       💠 3. CHỨC NĂNG GIẢNG VIÊN / ADMIN
+       ============================================================ */
+
+    /**
+     * Admin cập nhật role user (dùng để duyệt giảng viên)
+     */
     public function updateRole($user_id, $role) {
         $sql = "UPDATE users SET role = :role WHERE id = :id";
         $stmt = $this->conn->prepare($sql);
@@ -104,17 +132,18 @@ class User {
         ]);
     }
 
-    // =============================
-    //  CẬP NHẬT MẬT KHẨU
-    // =============================
+    /**
+     * Cập nhật mật khẩu người dùng
+     */
     public function updatePassword($id, $newPassword) {
         $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+
         $sql = "UPDATE users SET password = :password WHERE id = :id";
         $stmt = $this->conn->prepare($sql);
+
         return $stmt->execute([
             ':password' => $hashedPassword,
-            ':id' => $id
+            ':id'       => $id
         ]);
     }
-
 }

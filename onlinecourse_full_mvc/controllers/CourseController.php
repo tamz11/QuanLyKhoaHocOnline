@@ -62,9 +62,22 @@ class CourseController extends BaseController {
         $course = $this->courseModel->findById($id);
         $lessons = $this->lessonModel->getByCourse($id);
 
+        // kiểm tra đăng ký
+        require_once __DIR__ . '/../models/Enrollment.php';
+        $enrollModel = new Enrollment();
+        
+        $isEnrolled = false;
+
+        if (isset($_SESSION['user'])) {
+            $studentId = $_SESSION['user']['id'];
+            $isEnrolled = $enrollModel->isEnrolled($studentId, $id);
+        }
+
         $this->render('courses/detail', [
             'course' => $course,
-            'lessons' => $lessons
+            'lessons' => $lessons,
+            'isEnrolled' => $isEnrolled
         ]);
     }
+
 }
