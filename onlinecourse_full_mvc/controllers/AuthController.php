@@ -10,7 +10,7 @@ class AuthController extends BaseController {
     }
 
     // ============================
-    //  ĐĂNG NHẬP
+    //  ĐĂNG NHẬP (SHOW + POST)
     // ============================
     public function login() {
         $error = '';
@@ -28,10 +28,13 @@ class AuthController extends BaseController {
 
             if (!$user) {
                 $error = "Tài khoản không tồn tại.";
-            } elseif (!password_verify($password, $user['password'])) {
+            } 
+            elseif ($user['is_active'] == 0) {
+                $error = "Tài khoản của bạn đã bị vô hiệu hóa!";
+            }
+            elseif (!password_verify($password, $user['password'])) {
                 $error = "Sai mật khẩu.";
             } else {
-                // Lưu phiên đăng nhập
                 $_SESSION['user'] = $user;
 
                 // Điều hướng theo role
@@ -52,8 +55,8 @@ class AuthController extends BaseController {
     }
 
     // ============================
-//  XỬ LÝ ĐĂNG NHẬP (POST)
-// ============================
+    //  XỬ LÝ ĐĂNG NHẬP (POST)
+    // ============================
     public function doLogin()
     {
         $error = '';
@@ -62,26 +65,25 @@ class AuthController extends BaseController {
             return $this->redirect("index.php?controller=auth&action=login");
         }
 
-        $login    = trim($_POST['login']);    // form name="login"
+        $login    = trim($_POST['login']);
         $password = trim($_POST['password']);
 
-        // tìm user theo email hoặc username
         $user = $this->userModel->findByLogin($login);
 
         if (!$user) {
-            $error = "Tài khoản không tồn tại!";
-            return $this->render("auth/login", ['error' => $error]);
+            return $this->render("auth/login", ['error' => "Tài khoản không tồn tại!"]);
+        }
+
+        if ($user['is_active'] == 0) {
+            return $this->render("auth/login", ['error' => "Tài khoản của bạn đã bị vô hiệu hóa!"]);
         }
 
         if (!password_verify($password, $user['password'])) {
-            $error = "Mật khẩu không đúng!";
-            return $this->render("auth/login", ['error' => $error]);
+            return $this->render("auth/login", ['error' => "Mật khẩu không đúng!"]);
         }
 
-        // đăng nhập thành công → lưu session
         $_SESSION['user'] = $user;
 
-        // điều hướng theo ROLE
         switch ($user['role']) {
             case 2:
                 return $this->redirect("index.php?controller=admin&action=dashboard");
@@ -105,7 +107,7 @@ class AuthController extends BaseController {
     }
 
     // ============================
-    //  XỬ LÝ ĐĂNG KÝ (POST)
+    //  XỬ LÝ ĐĂNG KÝ
     // ============================
     public function doRegister() {
         $error = '';
@@ -121,67 +123,57 @@ class AuthController extends BaseController {
         $password = trim($_POST['password']);
         $confirm  = trim($_POST['confirm']);
 
-        // Kiểm tra mật khẩu khớp
         if ($password !== $confirm) {
-            $error = "Mật khẩu không khớp!";
-            return $this->render("auth/register", ['error' => $error]);
+            return $this->render("auth/register", ['error' => "Mật khẩu không khớp!"]);
         }
 
-        // Kiểm tra email tồn tại
         if ($this->userModel->findByEmail($email)) {
-            $error = "Email đã tồn tại!";
-            return $this->render("auth/register", ['error' => $error]);
+            return $this->render("auth/register", ['error' => "Email đã tồn tại!"]);
         }
 
-        // Kiểm tra username tồn tại
         if ($this->userModel->findByUsername($username)) {
-            $error = "Username đã tồn tại!";
-            return $this->render("auth/register", ['error' => $error]);
+            return $this->render("auth/register", ['error' => "Username đã tồn tại!"]);
         }
 
-        // Hash mật khẩu
         $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
 
-        // Chuẩn bị data
         $data = [
             ':fullname' => $fullname,
             ':username' => $username,
             ':email'    => $email,
             ':password' => $hashedPassword,
-            ':role'     => 0 // mặc định học viên
+            ':role'     => 0
         ];
 
-        // Lưu vào DB
         if ($this->userModel->createUser($data)) {
-            $success = "Đăng ký thành công! Bạn có thể đăng nhập.";
-            return $this->render("auth/register", ['success' => $success]);
-        } else {
-            $error = "Có lỗi xảy ra, vui lòng thử lại!";
-            return $this->render("auth/register", ['error' => $error]);
+
+            // ⭐⭐⭐ TỰ ĐỘNG ĐĂNG NHẬP NGAY SAU KHI ĐĂNG KÝ ⭐⭐⭐
+            $newUser = $this->userModel->findByLogin($email);
+            $_SESSION['user'] = $newUser;
+
+            // Chuyển sang dashboard học viên
+            return $this->redirect("index.php?controller=student&action=dashboard");
         }
+
+        return $this->render("auth/register", ['error' => "Có lỗi xảy ra, vui lòng thử lại!"]);
     }
 
     // ============================
     //  ĐĂNG XUẤT
     // ============================
-public function logout() {
-    // Xóa toàn bộ session
-    session_unset();
-    session_destroy();
+    public function logout() {
+        session_unset();
+        session_destroy();
 
-    // Xóa session cookie để đảm bảo logout thật sự
-    if (ini_get("session.use_cookies")) {
-        $params = session_get_cookie_params();
-        setcookie(session_name(), '', time() - 42000,
-            $params["path"], $params["domain"],
-            $params["secure"], $params["httponly"]
-        );
+        if (ini_get("session.use_cookies")) {
+            $params = session_get_cookie_params();
+            setcookie(session_name(), '', time() - 42000,
+                $params["path"], $params["domain"],
+                $params["secure"], $params["httponly"]
+            );
+        }
+
+        header("Location: index.php?controller=auth&action=login");
+        exit;
     }
-
-    // Chuyển hướng về login
-    header("Location: index.php?controller=auth&action=login");
-    exit;
-}
-
-
 }

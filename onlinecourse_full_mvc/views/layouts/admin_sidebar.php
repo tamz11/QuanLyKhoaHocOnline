@@ -16,7 +16,7 @@ $avatar = $currentUser['avatar'] ?? 'default-admin.png';
 
             <div class="card shadow-sm">
                 <div class="card-body text-center">
-                    <img src="assets/uploads/avatars/<?= htmlspecialchars($avatar) ?>"
+                    <img src="assets/uploads/avatars/<?= htmlspecialchars($avatar) ?? 'default.png' ?>"
                          class="rounded-circle mb-3" width="96" height="96" alt="Admin Avatar">
 
                     <h6 class="mb-0"><?= htmlspecialchars($currentUser['fullname'] ?? 'Quản trị viên') ?></h6>

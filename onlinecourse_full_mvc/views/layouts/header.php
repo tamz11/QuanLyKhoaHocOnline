@@ -114,20 +114,48 @@ $currentUser = $_SESSION['user'] ?? null;
 </header>
 
 <main class="flex-shrink-0">
+
+
 <?php
-// Hiện nút quay lại nếu KHÔNG ở trang chủ
+$controller = $_GET['controller'] ?? '';
+$action     = $_GET['action'] ?? '';
 
-$isHomePage = ($_GET['controller'] ?? '') === '' && ($_GET['action'] ?? '') === '';
+$currentRoute = $controller . ':' . $action;
 
-if (!$isHomePage):
+// =======================
+// RULE: Nếu là trang giảng viên và KHÔNG phải dashboard → hiện nút Back
+// =======================
+
+$showBack = false;
+
+if ($controller == 'instructor' && $action != 'dashboard' || $controller == 'student' && $action != 'dashboard'  
+|| $controller == 'admin' && $action != 'dashboard') {
+    $showBack = true;
+}
+
+// Các trang khác muốn thêm thủ công
+$allowBackExtra = [
+    'course:detail',
+    'course:search',
+    'student:courseProgress'
+];
+
+if (in_array($currentRoute, $allowBackExtra)) {
+    $showBack = true;
+}
+
 ?>
-<div class="container mt-3">
-    <a href="javascript:history.back()" 
-       class="d-inline-flex align-items-center text-decoration-none"
-       style="font-weight:600; color:#444;">
-        <i class="fa-solid fa-chevron-left me-2"></i> Quay lại
-    </a>
+
+<div class="container mt-3" style="min-height: 16px;">
+    <?php if ($showBack): ?>
+        <a href="javascript:history.back()"
+           class="d-inline-flex align-items-center text-decoration-none"
+           style="font-weight:600; color:#444;">
+            <i class="fa-solid fa-chevron-left me-2"></i> Quay lại
+        </a>
+    <?php endif; ?>
 </div>
-<?php endif; ?>
+
+
 
 
