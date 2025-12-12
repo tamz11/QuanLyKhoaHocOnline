@@ -24,7 +24,7 @@
                 </a>
                 <a href="index.php?controller=instructor&action=lessons"
                    class="list-group-item list-group-item-action <?= ($_GET['action'] ?? '') === 'lessons' ? 'active' : '' ?>">
-                    <i class="fa-solid fa-clapperboard-play me-2"></i>Quản lý bài học
+                    <i class="fa-solid fa-graduation-cap me-2"></i>Quản lý bài học
                 </a>
                 <a href="index.php?controller=instructor&action=materials"
                    class="list-group-item list-group-item-action <?= ($_GET['action'] ?? '') === 'materials' ? 'active' : '' ?>">
@@ -37,10 +37,6 @@
                 <a href="index.php?controller=instructor&action=changePassword"
                    class="list-group-item list-group-item-action <?= ($_GET['action'] ?? '') === 'changePassword' ? 'active' : '' ?>">
                     <i class="fa-solid fa-key me-2"></i>Đổi mật khẩu
-                </a>
-                <a href="index.php?controller=auth&action=logout"
-                   class="list-group-item list-group-item-action text-danger">
-                    <i class="fa-solid fa-right-from-bracket me-2"></i>Đăng xuất
                 </a>
             </div>
         </aside>

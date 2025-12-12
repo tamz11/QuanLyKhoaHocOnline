@@ -25,10 +25,15 @@
                        class="list-group-item list-group-item-action <?= ($_GET['action'] ?? '') === 'changePassword' ? 'active' : '' ?>">
                         <i class="fa-solid fa-key me-2"></i>Thay đổi mật khẩu
                     </a>
-                    <a href="index.php?controller=auth&action=logout"
-                       class="list-group-item list-group-item-action text-danger">
-                        <i class="fa-solid fa-right-from-bracket me-2"></i>Đăng xuất
-                    </a>
+
+                    <!-- ==== Thêm: Link 'Yêu cầu trở thành giảng viên' cho role = 0 (Học viên) ==== -->
+                    <?php if (isset($currentUser) && isset($currentUser['role']) && (int)$currentUser['role'] === 0): ?>
+                        <a href="index.php?controller=student&action=requestInstructor"
+                           class="list-group-item list-group-item-action <?= ($_GET['action'] ?? '') === 'requestInstructor' ? 'active' : '' ?>">
+                            <i class="fa-solid fa-chalkboard-user me-2"></i>Yêu cầu trở thành giảng viên
+                        </a>
+                    <?php endif; ?>
+                    <!-- ============================================================== -->
                 </div>
             </div>
         </aside>

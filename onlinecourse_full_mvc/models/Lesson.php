@@ -8,30 +8,51 @@ class Lesson {
         $this->pdo = Database::getConnection();
     }
 
-    // Lấy tất cả lesson theo course (thường dùng để hiển thị danh sách)
+    /* ============================================================
+       💠 1. CHỨC NĂNG CHUNG
+       ============================================================ */
+
+    /**
+     * Lấy danh sách bài học của một khóa học
+     * Thường dùng để hiển thị danh sách lesson theo đúng thứ tự
+     */
     public function getByCourse($courseId) {
-        $sql = "SELECT * FROM lessons WHERE course_id = ? ORDER BY `order` ASC";
+        $sql = "SELECT * FROM lessons 
+                WHERE course_id = ? 
+                ORDER BY `order` ASC";
+
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([$courseId]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    // Lấy lessons + trạng thái (is_done) cho 1 học viên
+
+    /* ============================================================
+       💠 2. CHỨC NĂNG DÀNH CHO HỌC VIÊN (Student)
+       ============================================================ */
+
+    /**
+     * Lấy danh sách bài học kèm trạng thái hoàn thành (is_done)
+     */
     public function getLessonsWithProgress($courseId, $studentId) {
         $sql = "SELECT 
                     l.*,
                     CASE WHEN lp.completed = 1 THEN 1 ELSE 0 END AS is_done
                 FROM lessons l
                 LEFT JOIN lesson_progress lp
-                    ON lp.lesson_id = l.id AND lp.student_id = ?
+                    ON lp.lesson_id = l.id 
+                   AND lp.student_id = ?
                 WHERE l.course_id = ?
                 ORDER BY l.`order` ASC";
+
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([$studentId, $courseId]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    // Lấy 1 lesson theo id
+    /**
+     * Lấy thông tin chi tiết của một bài học
+     */
     public function findById($lessonId) {
         $sql = "SELECT * FROM lessons WHERE id = ? LIMIT 1";
         $stmt = $this->pdo->prepare($sql);
@@ -39,33 +60,118 @@ class Lesson {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    // Lấy tài liệu cho 1 lesson
+    /**
+     * Lấy danh sách tài liệu thuộc một bài học
+     */
     public function getMaterials($lessonId) {
-        $sql = "SELECT * FROM materials WHERE lesson_id = ? ORDER BY uploaded_at DESC";
+        $sql = "SELECT * FROM materials 
+                WHERE lesson_id = ? 
+                ORDER BY uploaded_at DESC";
+
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([$lessonId]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    // Đánh dấu 1 lesson là đã làm (tạo record trong lesson_progress nếu chưa có)
+    /**
+     * Đánh dấu bài học là đã hoàn thành
+     */
     public function markLessonAsDone($studentId, $courseId, $lessonId) {
-        // kiểm tra đã có chưa
-        $sqlCheck = "SELECT id FROM lesson_progress WHERE student_id = ? AND lesson_id = ? LIMIT 1";
+
+        // Kiểm tra đã tồn tại record chưa
+        $sqlCheck = "SELECT id 
+                     FROM lesson_progress 
+                     WHERE student_id = ? AND lesson_id = ? 
+                     LIMIT 1";
+
         $stmt = $this->pdo->prepare($sqlCheck);
         $stmt->execute([$studentId, $lessonId]);
+
         if ($stmt->fetch()) {
-            return true; // đã có rồi
+            // Đã có => coi như done
+            return true;
         }
 
-        $sql = "INSERT INTO lesson_progress (student_id, course_id, lesson_id) VALUES (?, ?, ?)";
+        // Tạo mới record
+        $sql = "INSERT INTO lesson_progress (student_id, course_id, lesson_id) 
+                VALUES (?, ?, ?)";
+
         $stmt = $this->pdo->prepare($sql);
         return $stmt->execute([$studentId, $courseId, $lessonId]);
     }
 
-    // Nếu cần bỏ dấu hoàn thành (không bắt buộc)
+    /**
+     * Bỏ trạng thái hoàn thành bài học (không bắt buộc phải dùng)
+     */
     public function unmarkLesson($studentId, $lessonId) {
-        $sql = "DELETE FROM lesson_progress WHERE student_id = ? AND lesson_id = ?";
+        $sql = "DELETE FROM lesson_progress 
+                WHERE student_id = ? AND lesson_id = ?";
+
         $stmt = $this->pdo->prepare($sql);
         return $stmt->execute([$studentId, $lessonId]);
+    }
+
+
+    /* ============================================================
+       💠 3. CHỨC NĂNG DÀNH CHO GIẢNG VIÊN / ADMIN (CRUD LESSON)
+       ============================================================ */
+
+    /**
+     * Tạo bài học mới
+     */
+    public function create($data) {
+        $sql = "INSERT INTO lessons (course_id, title, content, video_url, `order`)
+                VALUES (?, ?, ?, ?, ?)";
+
+        $stmt = $this->pdo->prepare($sql);
+        return $stmt->execute([
+            $data['course_id'],
+            $data['title'],
+            $data['content'],
+            $data['video_url'] ?? null,
+            $data['order'] ?? 1
+        ]);
+    }
+
+    /**
+     * Cập nhật bài học
+     */
+    public function update($id, $data) {
+        $sql = "UPDATE lessons 
+                SET title = ?, content = ?, video_url = ?, `order` = ? 
+                WHERE id = ?";
+
+        $stmt = $this->pdo->prepare($sql);
+        return $stmt->execute([
+            $data['title'],
+            $data['content'],
+            $data['video_url'] ?? null,
+            $data['order'] ?? 1,
+            $id
+        ]);
+    }
+
+    /**
+     * Xóa bài học
+     */
+    public function delete($id) {
+        $sql = "DELETE FROM lessons WHERE id = ?";
+        $stmt = $this->pdo->prepare($sql);
+        return $stmt->execute([$id]);
+    }
+
+    /**
+     * Lấy thứ tự lớn nhất (order) để thêm bài mới đúng vị trí
+     */
+    public function getMaxOrder($courseId) {
+        $sql = "SELECT MAX(`order`) AS max_order 
+                FROM lessons 
+                WHERE course_id = ?";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([$courseId]);
+
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result['max_order'] ?? 0;
     }
 }

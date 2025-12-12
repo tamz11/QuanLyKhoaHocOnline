@@ -50,15 +50,11 @@ $avatar = $currentUser['avatar'] ?? 'default-admin.png';
                     <i class="fa-solid fa-check me-2"></i> Duyệt khóa học mới
                 </a>
 
+
                 <a href="index.php?controller=admin&action=changePassword"
                    class="list-group-item list-group-item-action 
                    <?= ($_GET['action'] ?? '') === 'changePassword' ? 'active' : '' ?>">
                     <i class="fa-solid fa-key me-2"></i> Thay đổi mật khẩu
-                </a>
-
-                <a href="index.php?controller=auth&action=logout"
-                   class="list-group-item list-group-item-action text-danger">
-                    <i class="fa-solid fa-right-from-bracket me-2"></i> Đăng xuất
                 </a>
             </div>
 
