@@ -63,7 +63,7 @@
                                 </td>
                                 <td>
                                     <?php if ($completed): ?>
-                                        15/12/2025
+                                        <?= $completionDates[$lesson['id']] ?? 'N/A' ?>
                                     <?php else: ?>
                                         -
                                     <?php endif; ?>
