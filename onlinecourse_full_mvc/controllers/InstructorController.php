@@ -16,7 +16,15 @@ class InstructorController extends BaseController
     public function dashboard()
     {
         $this->requireRole([1, 2]); // giảng viên + admin
-        $this->render('instructor/dashboard');
+        $courseModel = new Course();
+        $stats = $courseModel->getInstructorStats($this->currentUser['id']);
+        $recentCourses = $courseModel->getRecentCoursesWithCounts($this->currentUser['id']);
+        $this->render('instructor/dashboard', [
+            'totalCourses' => $stats['totalCourses'],
+            'totalStudents' => $stats['totalStudents'],
+            'totalLessons' => $stats['totalLessons'],
+            'recentCourses' => $recentCourses
+        ]);
     }
 
     // ===========================
@@ -205,8 +213,11 @@ class InstructorController extends BaseController
         $this->requireRole([1, 2]);
         $courseId = $_GET['course_id'] ?? null;
         if (!$courseId) {
-            header('Location: index.php?controller=instructor&action=myCourses');
-            exit;
+            // Hiển thị danh sách khóa học để chọn
+            $courseModel = new Course();
+            $courses = $courseModel->getByInstructor($this->currentUser['id']);
+            $this->render('instructor/select_course', ['courses' => $courses, 'action' => 'lessons', 'title' => 'Chọn khóa học để quản lý bài học']);
+            return;
         }
 
         // Kiểm tra quyền sở hữu khóa học
@@ -388,8 +399,11 @@ class InstructorController extends BaseController
         $this->requireRole([1, 2]);
         $courseId = $_GET['course_id'] ?? null;
         if (!$courseId) {
-            header('Location: index.php?controller=instructor&action=myCourses');
-            exit;
+            // Hiển thị danh sách khóa học để chọn
+            $courseModel = new Course();
+            $courses = $courseModel->getByInstructor($this->currentUser['id']);
+            $this->render('instructor/select_course', ['courses' => $courses, 'action' => 'materials', 'title' => 'Chọn khóa học để quản lý tài liệu']);
+            return;
         }
 
         // Kiểm tra quyền sở hữu khóa học
@@ -548,8 +562,11 @@ class InstructorController extends BaseController
         $this->requireRole([1, 2]);
         $courseId = $_GET['course_id'] ?? null;
         if (!$courseId) {
-            header('Location: index.php?controller=instructor&action=myCourses');
-            exit;
+            // Hiển thị danh sách khóa học để chọn
+            $courseModel = new Course();
+            $courses = $courseModel->getByInstructor($this->currentUser['id']);
+            $this->render('instructor/select_course', ['courses' => $courses, 'action' => 'students', 'title' => 'Chọn khóa học để xem học viên']);
+            return;
         }
 
         // Kiểm tra quyền sở hữu khóa học

@@ -34,11 +34,6 @@
                         </a>
                     <?php endif; ?>
                     <!-- ============================================================== -->
-
-                    <a href="index.php?controller=auth&action=logout"
-                       class="list-group-item list-group-item-action text-danger">
-                        <i class="fa-solid fa-right-from-bracket me-2"></i>Đăng xuất
-                    </a>
                 </div>
             </div>
         </aside>
