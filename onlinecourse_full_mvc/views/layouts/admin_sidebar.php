@@ -52,11 +52,6 @@ $avatar = $currentUser['avatar'] ?? 'default-admin.png';
                    <?= ($_GET['action'] ?? '') === 'changePassword' ? 'active' : '' ?>">
                     <i class="fa-solid fa-key me-2"></i> Thay đổi mật khẩu
                 </a>
-
-                <a href="index.php?controller=auth&action=logout"
-                   class="list-group-item list-group-item-action text-danger">
-                    <i class="fa-solid fa-right-from-bracket me-2"></i> Đăng xuất
-                </a>
             </div>
 
         </aside>

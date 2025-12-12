@@ -45,25 +45,13 @@
                 <td><?= $course['id'] ?></td>
                 <td><?= htmlspecialchars($course['title']) ?></td>
                 <td><?= htmlspecialchars($course['category_name']) ?></td>
-                <td>$<?= $course['price'] ?></td>
+                <td><?= number_format($course['price']) ?>đ</td>
                 <td><?= htmlspecialchars($course['level']) ?></td>
                 <td><?= htmlspecialchars($course['status'] ?? 'Đã duyệt') ?></td>
                 <td class="text-end">
                     <a href="index.php?controller=instructor&action=editCourse&id=<?= $course['id'] ?>"
                        class="btn btn-sm btn-outline-primary">
                         <i class="fa-solid fa-pen"></i>
-                    </a>
-                    <a href="index.php?controller=instructor&action=lessons&course_id=<?= $course['id'] ?>"
-                       class="btn btn-sm btn-outline-secondary">
-                        Bài giảng
-                    </a>
-                    <a href="index.php?controller=instructor&action=materials&course_id=<?= $course['id'] ?>"
-                       class="btn btn-sm btn-outline-info">
-                        Tài liệu
-                    </a>
-                    <a href="index.php?controller=instructor&action=students&course_id=<?= $course['id'] ?>"
-                       class="btn btn-sm btn-outline-success">
-                        Học viên
                     </a>
                     <a href="index.php?controller=instructor&action=deleteCourse&id=<?= $course['id'] ?>"
                        class="btn btn-sm btn-outline-danger"

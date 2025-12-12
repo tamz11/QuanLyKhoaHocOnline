@@ -111,18 +111,4 @@ $currentUser = $_SESSION['user'] ?? null;
 </header>
 
 <main class="flex-shrink-0">
-    <?php
-// Hiện nút quay lại nếu KHÔNG ở trang chủ
-$isHomePage = ($_GET['controller'] ?? '') === '' && ($_GET['action'] ?? '') === '';
-
-if (!$isHomePage):
-?>
-<div class="container mt-3">
-    <a href="javascript:history.back()" 
-       class="d-inline-flex align-items-center text-decoration-none"
-       style="font-weight:600; color:#444;">
-        <i class="fa-solid fa-chevron-left me-2"></i> Quay lại
-    </a>
-</div>
-<?php endif; ?>
 

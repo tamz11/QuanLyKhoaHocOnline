@@ -195,4 +195,58 @@ class Course {
         return $stmt->execute([$id]);
     }
 
+    /* ============================
+       THỐNG KÊ DASHBOARD GIẢNG VIÊN
+    ============================= */
+    public function getInstructorStats($instructorId) {
+        // Tổng khóa học
+        $sqlCourses = "SELECT COUNT(*) as total_courses FROM courses WHERE instructor_id = ?";
+        $stmtCourses = $this->pdo->prepare($sqlCourses);
+        $stmtCourses->execute([$instructorId]);
+        $totalCourses = $stmtCourses->fetch()['total_courses'] ?? 0;
+
+        // Tổng học viên (từ tất cả khóa học của giảng viên)
+        $sqlStudents = "SELECT COUNT(DISTINCT e.student_id) as total_students 
+                        FROM enrollments e 
+                        JOIN courses c ON e.course_id = c.id 
+                        WHERE c.instructor_id = ?";
+        $stmtStudents = $this->pdo->prepare($sqlStudents);
+        $stmtStudents->execute([$instructorId]);
+        $totalStudents = $stmtStudents->fetch()['total_students'] ?? 0;
+
+        // Tổng bài giảng
+        $sqlLessons = "SELECT COUNT(*) as total_lessons 
+                       FROM lessons l 
+                       JOIN courses c ON l.course_id = c.id 
+                       WHERE c.instructor_id = ?";
+        $stmtLessons = $this->pdo->prepare($sqlLessons);
+        $stmtLessons->execute([$instructorId]);
+        $totalLessons = $stmtLessons->fetch()['total_lessons'] ?? 0;
+
+        return [
+            'totalCourses' => $totalCourses,
+            'totalStudents' => $totalStudents,
+            'totalLessons' => $totalLessons
+        ];
+    }
+
+    public function getRecentCoursesWithCounts($instructorId, $limit = 5) {
+        $sql = "SELECT 
+                    c.id, 
+                    c.title, 
+                    cat.name AS category_name,
+                    (SELECT COUNT(*) FROM lessons WHERE course_id = c.id) AS lessons_count,
+                    (SELECT COUNT(*) FROM enrollments WHERE course_id = c.id) AS students_count
+                FROM courses c
+                LEFT JOIN categories cat ON c.category_id = cat.id
+                WHERE c.instructor_id = ?
+                ORDER BY c.created_at DESC
+                LIMIT ?";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindParam(1, $instructorId, PDO::PARAM_INT);
+        $stmt->bindParam(2, $limit, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
 } 
