@@ -3,10 +3,32 @@ require_once __DIR__ . '/../models/Category.php';
 
 class AdminController extends BaseController {
 
-    // Trang dashboard của admin
+    // ================================================================
+    // ⭐ DASHBOARD - THỐNG KÊ HỆ THỐNG
+    // ================================================================
     public function dashboard() {
-        $this->requireRole([2]); 
-        $this->render("admin/dashboard");
+        $this->requireRole([2]);
+
+        require_once __DIR__ . '/../models/User.php';
+        require_once __DIR__ . '/../models/Course.php';
+        require_once __DIR__ . '/../models/Category.php';
+
+        $userModel     = new User();
+        $courseModel   = new Course();
+        $categoryModel = new Category();
+
+        $stats = [
+            'total_users'      => $userModel->countAll(),
+            'students'         => $userModel->countStudents(),
+            'instructors'      => $userModel->countInstructors(),
+            'total_courses'    => $courseModel->countAll(),
+            'pending_courses'  => $courseModel->countPending(),
+            'total_categories' => $categoryModel->countAll(),
+        ];
+
+        $this->render("admin/dashboard", [
+            'stats' => $stats
+        ]);
     }
 
     // ================================================================
@@ -28,20 +50,17 @@ class AdminController extends BaseController {
     // ================================================================
     // ⭐ QUẢN LÝ DANH MỤC KHÓA HỌC
     // ================================================================
-
-    // Hiển thị danh sách danh mục
     public function categories() {
         $this->requireRole([2]);
 
         $catModel = new Category();
-        $categories = $catModel->getAll();   // ✅ SỬA all() → getAll()
+        $categories = $catModel->getAll();
 
         $this->render("admin/categories/list", [
             'categories' => $categories
         ]);
     }
 
-    // Form thêm danh mục
     public function categoriesCreate() {
         $this->requireRole([2]);
         $this->render("admin/categories/create", [
@@ -50,7 +69,6 @@ class AdminController extends BaseController {
         ]);
     }
 
-    // Xử lý thêm danh mục
     public function categoriesStore() {
         $this->requireRole([2]);
 
@@ -69,20 +87,19 @@ class AdminController extends BaseController {
         }
 
         $catModel = new Category();
-        $catModel->create($name, $desc);   // ✅ SỬA: truyền 2 giá trị, không truyền mảng
+        $catModel->create($name, $desc);
 
         $_SESSION['flash'] = "Thêm danh mục thành công!";
         return $this->redirect("index.php?controller=admin&action=categories");
     }
 
-    // Form sửa danh mục
     public function categoriesEdit() {
         $this->requireRole([2]);
 
         $id = $_GET['id'] ?? null;
 
         $catModel = new Category();
-        $cat = $catModel->findById($id);    // ✅ SỬA find() → findById()
+        $cat = $catModel->findById($id);
 
         $this->render("admin/categories/edit", [
             'category' => $cat,
@@ -90,7 +107,6 @@ class AdminController extends BaseController {
         ]);
     }
 
-    // Xử lý cập nhật danh mục
     public function categoriesUpdate() {
         $this->requireRole([2]);
 
@@ -100,7 +116,7 @@ class AdminController extends BaseController {
 
         if ($name === "") {
             $catModel = new Category();
-            $cat = $catModel->findById($id);   // ✅ SỬA find() → findById()
+            $cat = $catModel->findById($id);
 
             return $this->render("admin/categories/edit", [
                 'category' => $cat,
@@ -109,13 +125,12 @@ class AdminController extends BaseController {
         }
 
         $catModel = new Category();
-        $catModel->update($id, $name, $desc);   // ✅ SỬA: truyền đúng tham số
+        $catModel->update($id, $name, $desc);
 
         $_SESSION['flash'] = "Cập nhật danh mục thành công!";
         return $this->redirect("index.php?controller=admin&action=categories");
     }
 
-    // Xóa danh mục
     public function categoriesDelete() {
         $this->requireRole([2]);
 
@@ -288,4 +303,5 @@ class AdminController extends BaseController {
             'studentEnrollments' => $studentEnrollments
         ]);
     }
+
 }

@@ -18,95 +18,29 @@ class StudentController extends BaseController {
         $this->courseModel = new Course();
     }
 
-    // Dashboard học viên
+    // ================= DASHBOARD =================
     public function dashboard() {
-        $this->requireRole([0, 1, 2]); // học viên + giảng viên + admin
+        $this->requireRole([0, 1, 2]);
 
         $studentId = $_SESSION['user']['id'];
 
-        $overallProgress = $this->enrollModel->getOverallProgress($studentId);
-        $totalCourses = $this->enrollModel->countMyCourses($studentId);
-        $completedCourses = $this->enrollModel->countCompletedCourses($studentId);
+        $overallProgress   = $this->enrollModel->getOverallProgress($studentId);
+        $totalCourses      = $this->enrollModel->countMyCourses($studentId);
+        $completedCourses  = $this->enrollModel->countCompletedCourses($studentId);
 
         $this->render('student/dashboard', [
-            'overallProgress' => $overallProgress,
-            'totalCourses' => $totalCourses,
-            'completedCourses' => $completedCourses,
-            'currentUser' => $_SESSION['user']
+            'overallProgress'   => $overallProgress,
+            'totalCourses'      => $totalCourses,
+            'completedCourses'  => $completedCourses,
+            'currentUser'       => $_SESSION['user']
         ]);
     }
 
-    // Khóa học đã đăng ký
-    public function myCourses() {
-        $this->requireRole([0, 1, 2]);
-
-        $studentId = $_SESSION['user']['id'];
-        $myCourses = $this->enrollModel->getMyCourses($studentId);
-
-        $this->render('student/my_courses', [
-            'myCourses' => $myCourses,
-            'currentUser' => $_SESSION['user']
-        ]);
-    }
-
-    // Tiến độ học tập
-    public function courseProgress() {
-        $this->requireRole([0, 1, 2]);
-
-        $studentId = $_SESSION['user']['id'];
-        $courseId = $_GET['course_id'] ?? null;
-
-        if (!$courseId) {
-            header("Location: index.php?controller=student&action=myCourses");
-            exit;
-        }
-
-        // Lấy thông tin khóa học
-        $course = $this->courseModel->findById($courseId);
-
-        // Lấy danh sách bài học kèm trạng thái hoàn thành
-        $lessons = $this->lessonModel->getLessonsWithProgress($courseId, $studentId);
-
-        // Lấy danh sách bài học đã hoàn thành
-        $completedLessons = $this->enrollModel->getCompletedLessons($studentId, $courseId);
-
-        // Xác định bài học đang xem
-        $lessonId = $_GET['lesson_id'] ?? ($lessons[0]['id'] ?? null);
-        $currentLesson = $lessonId ? $this->lessonModel->findById($lessonId) : null;
-
-        // Tài liệu
-        $materials = $currentLesson ? $this->lessonModel->getMaterials($currentLesson['id']) : [];
-
-        // Tính lại tiến độ
-        $progress = $this->enrollModel->recalcAndUpdateProgress($studentId, $courseId);
-
-        $this->render('student/course_progress', [
-            'course' => $course,
-            'lessons' => $lessons,
-            'currentLesson' => $currentLesson,
-            'materials' => $materials,
-            'completedLessons' => $completedLessons,
-            'progress' => $progress,
-            'currentUser' => $_SESSION['user']
-        ]);
-    }
-
-    // Đổi mật khẩu
-    public function changePassword() {
-        $this->requireRole([0, 1, 2]);
-        $this->render('student/change_password');
-    }
-
-    // =================================================================
-    // 1) HIỂN THỊ FORM GỬI YÊU CẦU TRỞ THÀNH GIẢNG VIÊN
-    // =================================================================
-    public function requestInstructor()
-    {
-        $this->requireRole([0]); // chỉ học viên mới được gửi yêu cầu
+    // ================= REQUEST INSTRUCTOR FORM =================
+    public function requestInstructor() {
+        $this->requireRole([0]);
 
         $requestModel = new InstructorRequest();
-
-        // Kiểm tra user đã gửi yêu cầu trước chưa
         $existing = $requestModel->findByUserId($_SESSION['user']['id']);
 
         $this->render("student/request_instructor", [
@@ -114,11 +48,8 @@ class StudentController extends BaseController {
         ]);
     }
 
-    // =================================================================
-    // 2) XỬ LÝ POST GỬI YÊU CẦU
-    // =================================================================
-    public function doRequestInstructor()
-    {
+    // ================= HANDLE REQUEST (FIXED) =================
+    public function doRequestInstructor() {
         $this->requireRole([0]);
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -128,17 +59,17 @@ class StudentController extends BaseController {
         $description = trim($_POST['description'] ?? '');
 
         if (empty($description)) {
-            echo "<script>alert('Vui lòng nhập lý do!'); window.history.back();</script>";
-            return;
+            $_SESSION['request_error'] = 'Vui lòng nhập lý do!';
+            return $this->redirect("index.php?controller=student&action=requestInstructor");
         }
 
         $userId = $_SESSION['user']['id'];
         $requestModel = new InstructorRequest();
 
-        // kiểm tra đã gửi yêu cầu chưa
+        // Đã gửi yêu cầu trước đó
         if ($requestModel->findByUserId($userId)) {
-            echo "<script>alert('Bạn đã gửi yêu cầu trước đó rồi!'); window.history.back();</script>";
-            return;
+            $_SESSION['request_error'] = 'Bạn đã gửi yêu cầu trước đó rồi!';
+            return $this->redirect("index.php?controller=student&action=requestInstructor");
         }
 
         // Tạo yêu cầu
@@ -149,26 +80,21 @@ class StudentController extends BaseController {
             'created_at' => date('Y-m-d H:i:s')
         ]);
 
-        echo "<script>
-                alert('Gửi yêu cầu thành công! Vui lòng chờ Admin duyệt.');
-                window.location = 'index.php?controller=student&action=dashboard';
-              </script>";
+        // ✅ SUCCESS FLAG
+        $_SESSION['request_success'] = true;
+
+        return $this->redirect("index.php?controller=student&action=requestInstructor");
     }
 
-    // =================================================================
-    // 3) ĐÁNH DẤU BÀI HỌC HOÀN THÀNH (TỪ MASTER)
-    // =================================================================
+    // ================= MARK LESSON DONE =================
     public function markDone() {
         $this->requireRole([0]);
 
         $studentId = $_SESSION['user']['id'];
-        $courseId = $_GET['course_id'] ?? 0;
-        $lessonId = $_GET['lesson_id'] ?? 0;
+        $courseId  = $_GET['course_id'] ?? 0;
+        $lessonId  = $_GET['lesson_id'] ?? 0;
 
-        // Đánh dấu hoàn thành bài học
         $this->lessonModel->markLessonAsDone($studentId, $courseId, $lessonId);
-
-        // Cập nhật tiến độ
         $this->enrollModel->recalcAndUpdateProgress($studentId, $courseId);
 
         header("Location: index.php?controller=student&action=courseProgress&course_id=$courseId&lesson_id=$lessonId");
