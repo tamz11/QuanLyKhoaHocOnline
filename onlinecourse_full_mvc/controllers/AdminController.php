@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../models/Category.php';
 
 class AdminController extends BaseController {
 
@@ -8,7 +9,9 @@ class AdminController extends BaseController {
         $this->render("admin/dashboard");
     }
 
-    // Quản lý user
+    // ================================================================
+    // ⭐ QUẢN LÝ USER
+    // ================================================================
     public function users() {
         $this->requireRole([2]);
 
@@ -22,19 +25,120 @@ class AdminController extends BaseController {
         ]);
     }
 
-    // Quản lý danh mục
+    // ================================================================
+    // ⭐ QUẢN LÝ DANH MỤC KHÓA HỌC
+    // ================================================================
+
+    // Hiển thị danh sách danh mục
     public function categories() {
         $this->requireRole([2]);
-        $this->render('admin/categories/list');
+
+        $catModel = new Category();
+        $categories = $catModel->getAll();   // ✅ SỬA all() → getAll()
+
+        $this->render("admin/categories/list", [
+            'categories' => $categories
+        ]);
     }
 
-    // Duyệt khóa học
+    // Form thêm danh mục
+    public function categoriesCreate() {
+        $this->requireRole([2]);
+        $this->render("admin/categories/create", [
+            'error' => '',
+            'old' => []
+        ]);
+    }
+
+    // Xử lý thêm danh mục
+    public function categoriesStore() {
+        $this->requireRole([2]);
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            return $this->redirect("index.php?controller=admin&action=categories");
+        }
+
+        $name = trim($_POST['name']);
+        $desc = trim($_POST['description']);
+
+        if ($name === "") {
+            return $this->render("admin/categories/create", [
+                'error' => "Tên danh mục không được để trống!",
+                'old' => ['name' => $name, 'description' => $desc]
+            ]);
+        }
+
+        $catModel = new Category();
+        $catModel->create($name, $desc);   // ✅ SỬA: truyền 2 giá trị, không truyền mảng
+
+        $_SESSION['flash'] = "Thêm danh mục thành công!";
+        return $this->redirect("index.php?controller=admin&action=categories");
+    }
+
+    // Form sửa danh mục
+    public function categoriesEdit() {
+        $this->requireRole([2]);
+
+        $id = $_GET['id'] ?? null;
+
+        $catModel = new Category();
+        $cat = $catModel->findById($id);    // ✅ SỬA find() → findById()
+
+        $this->render("admin/categories/edit", [
+            'category' => $cat,
+            'error' => ''
+        ]);
+    }
+
+    // Xử lý cập nhật danh mục
+    public function categoriesUpdate() {
+        $this->requireRole([2]);
+
+        $id = $_POST['id'];
+        $name = trim($_POST['name']);
+        $desc = trim($_POST['description']);
+
+        if ($name === "") {
+            $catModel = new Category();
+            $cat = $catModel->findById($id);   // ✅ SỬA find() → findById()
+
+            return $this->render("admin/categories/edit", [
+                'category' => $cat,
+                'error' => "Tên danh mục không được để trống!"
+            ]);
+        }
+
+        $catModel = new Category();
+        $catModel->update($id, $name, $desc);   // ✅ SỬA: truyền đúng tham số
+
+        $_SESSION['flash'] = "Cập nhật danh mục thành công!";
+        return $this->redirect("index.php?controller=admin&action=categories");
+    }
+
+    // Xóa danh mục
+    public function categoriesDelete() {
+        $this->requireRole([2]);
+
+        $id = $_GET['id'];
+
+        $catModel = new Category();
+        $catModel->delete($id);
+
+        $_SESSION['flash'] = "Đã xoá danh mục!";
+        return $this->redirect("index.php?controller=admin&action=categories");
+    }
+
+    // ================================================================
+    // ⭐ DUYỆT KHÓA HỌC
+    // ================================================================
     public function approveCourses() {
         $this->requireRole([2]);
         $this->render('admin/courses/approve');
     }
 
-    // Đổi mật khẩu
+    // ================================================================
+    // ⭐ ĐỔI MẬT KHẨU
+    // ================================================================
     public function changePassword() {
         $this->requireRole([2]);
         $this->render('admin/change_password');
@@ -45,7 +149,9 @@ class AdminController extends BaseController {
         echo "Đã nhận dữ liệu đổi mật khẩu của admin!";
     }
 
-    // Danh sách yêu cầu giảng viên
+    // ================================================================
+    // ⭐ DANH SÁCH YÊU CẦU GIẢNG VIÊN
+    // ================================================================
     public function instructorRequests() {
         $this->requireRole([2]);
         require_once __DIR__ . '/../models/InstructorRequest.php';
@@ -58,7 +164,7 @@ class AdminController extends BaseController {
         ]);
     }
 
-    // Xử lý duyệt / từ chối
+    // Xử lý duyệt / từ chối yêu cầu giảng viên
     public function handleInstructorRequest() {
         $this->requireRole([2]);
 
@@ -124,7 +230,6 @@ class AdminController extends BaseController {
 
         } elseif ($action === "delete") {
 
-            // Không cho xoá user nếu còn active
             if ((int)$user['is_active'] === 1) {
                 $_SESSION['flash_error'] = "Bạn phải vô hiệu hóa tài khoản trước khi xoá!";
                 header("Location: index.php?controller=admin&action=users");
@@ -147,11 +252,10 @@ class AdminController extends BaseController {
     }
 
     // ================================================================
-    // ⭐ XEM CHI TIẾT USER (ĐÃ MỞ RỘNG CHUẨN MVC)
+    // ⭐ XEM CHI TIẾT USER
     // ================================================================
-    public function userDetail()
-    {
-        $this->requireRole([2]); // Chỉ admin được xem
+    public function userDetail() {
+        $this->requireRole([2]);
 
         if (!isset($_GET['id'])) {
             die("Thiếu ID người dùng!");
@@ -168,29 +272,20 @@ class AdminController extends BaseController {
             die("Người dùng không tồn tại!");
         }
 
-        // ----------------------------------------------
-        // Nếu là GIẢNG VIÊN -> lấy danh sách khóa học tạo
-        // ----------------------------------------------
         $instructorCourses = [];
         if ((int)$user['role'] === 1) {
             $instructorCourses = $userModel->getInstructorCourses($id);
         }
 
-        // ----------------------------------------------
-        // Nếu là HỌC VIÊN -> lấy danh sách khóa học đã đăng ký
-        // ----------------------------------------------
         $studentEnrollments = [];
         if ((int)$user['role'] === 0) {
             $studentEnrollments = $userModel->getStudentEnrollments($id);
         }
 
-        // Render view và truyền thêm dữ liệu
         $this->render("admin/users/detail", [
             'user' => $user,
             'instructorCourses' => $instructorCourses,
             'studentEnrollments' => $studentEnrollments
         ]);
     }
-
 }
-
