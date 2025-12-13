@@ -1,4 +1,3 @@
-<?php include __DIR__ . '/../layouts/admin_sidebar.php'; ?>
 
 <h3 class="mb-4">Thay đổi mật khẩu</h3>
 

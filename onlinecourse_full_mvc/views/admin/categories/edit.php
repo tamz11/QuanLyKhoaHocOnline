@@ -1,11 +1,18 @@
-<?php include __DIR__ . '/../../layouts/header.php'; ?>
-<?php include __DIR__ . '/../../layouts/admin_sidebar.php'; ?>
+
+<div class="container py-4">
 
 <h2 class="mb-4">✏ Sửa danh mục khóa học</h2>
 
     <div class="card shadow-sm">
         <div class="card-body">
-            <form method="post" action="">
+
+            <!-- ⭐ Sửa action để gửi về đúng controller -->
+            <form method="post" action="index.php?controller=admin&action=categoriesUpdate">
+
+
+                <!-- Truyền ID danh mục cần sửa -->
+                <input type="hidden" name="id" value="<?= htmlspecialchars($category['id']) ?>">
+
                 <div class="mb-3">
                     <label class="form-label">Tên danh mục</label>
                     <input type="text"
@@ -23,10 +30,15 @@
                 </div>
 
                 <button class="btn btn-primary">✔ Cập nhật</button>
-                <a href="/index.php?controller=admin&action=listCategories"
+
+                <!-- ⭐ Sửa link quay lại -->
+                <a href="index.php?controller=admin&action=categories"
                    class="btn btn-secondary ms-2">← Quay lại</a>
+
             </form>
+
         </div>
     </div>
+
 </div>
-<?php include __DIR__ . '/../../layouts/footer.php'; ?>
+

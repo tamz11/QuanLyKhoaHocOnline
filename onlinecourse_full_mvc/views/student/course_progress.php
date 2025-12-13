@@ -21,24 +21,30 @@
             <div class="card-header">
                 <strong>Bài giảng</strong>
             </div>
+
             <ul class="list-group list-group-flush">
 
+            <?php if (empty($lessons)): ?>
+                <li class="list-group-item text-muted small">
+                    Khóa học này chưa có bài học.
+                </li>
+            <?php else: ?>
                 <?php foreach ($lessons as $lesson): ?>
                     <li class="list-group-item d-flex justify-content-between align-items-center
-                        <?= ($currentLesson['id'] ?? null) == $lesson['id'] ? 'active text-light' : '' ?>">
-
+                        <?= ($currentLesson && $currentLesson['id'] == $lesson['id']) ? 'active text-light' : '' ?>">
                         <!-- Link xem bài giảng -->
-                        <a href="index.php?controller=student&action=courseProgress&course_id=<?= $course['id'] ?>&lesson_id=<?= $lesson['id'] ?>"
-                           class="<?= ($currentLesson['id'] ?? null) == $lesson['id'] ? 'text-light' : '' ?>">
+                        <a href="index.php?controller=student&action=courseProgress
+                            &course_id=<?= $course['id'] ?>&lesson_id=<?= $lesson['id'] ?>"
+                        class="<?= ($currentLesson && $currentLesson['id'] == $lesson['id']) ? 'text-light' : '' ?>">
                             <?= $lesson['order'] ?>. <?= htmlspecialchars($lesson['title']) ?>
                         </a>
-
                         <!-- Icon đã hoàn thành -->
                         <?php if (in_array($lesson['id'], $completedLessons)): ?>
                             <i class="fa-solid fa-circle-check text-success"></i>
                         <?php endif; ?>
                     </li>
                 <?php endforeach; ?>
+            <?php endif; ?>
 
             </ul>
         </div>
@@ -51,37 +57,43 @@
         <div class="card shadow-sm mb-3">
             <div class="card-body">
 
-                <h5 class="card-title mb-3"><?= htmlspecialchars($currentLesson['title'] ?? '') ?></h5>
-
+                <h5 class="card-title mb-3">
+                    <?= htmlspecialchars($currentLesson['title'] ?? 'Nội dung bài học') ?>
+                </h5>
                 <!-- Video bài học -->
                 <?php if (!empty($currentLesson['video_url'])): ?>
                     <div class="ratio ratio-16x9 mb-3">
-                        <iframe src="<?= htmlspecialchars($currentLesson['video_url']) ?>"
-                                allowfullscreen></iframe>
+                        <iframe src="<?= htmlspecialchars($currentLesson['video_url']) ?>" allowfullscreen></iframe>
                     </div>
                 <?php endif; ?>
-
                 <!-- Nội dung bài học -->
                 <div class="lesson-content">
-                    <?= $currentLesson['content'] ?? '<p>Nội dung bài học đang được cập nhật.</p>' ?>
+                    <?= $currentLesson['content'] ?? '<p class="text-muted">Nội dung bài học đang được cập nhật.</p>' ?>
                 </div>
+
             </div>
         </div>
 
         <!-- ============================= -->
         <!-- NÚT ĐÁNH DẤU HOÀN THÀNH      -->
         <!-- ============================= -->
-        <?php if (!in_array($currentLesson['id'], $completedLessons)): ?>
-            <a href="index.php?controller=student&action=markDone&lesson_id=<?= $currentLesson['id'] ?>&course_id=<?= $course['id'] ?>"
-               class="btn btn-success mb-3">
-                <i class="fa-solid fa-check me-1"></i> Đánh dấu hoàn thành
-            </a>
-        <?php else: ?>
-            <div class="alert alert-success d-flex align-items-center mb-3">
-                <i class="fa-solid fa-circle-check me-2"></i>
-                Bạn đã hoàn thành bài học này!
-            </div>
+        <?php if ($currentLesson): ?>
+
+            <?php if (!in_array($currentLesson['id'], $completedLessons)): ?>
+                <a href="index.php?controller=student&action=markDone
+                    &lesson_id=<?= $currentLesson['id'] ?>&course_id=<?= $course['id'] ?>"
+                class="btn btn-success mb-3">
+                    <i class="fa-solid fa-check me-1"></i> Đánh dấu hoàn thành
+                </a>
+            <?php else: ?>
+                <div class="alert alert-success d-flex align-items-center mb-3">
+                    <i class="fa-solid fa-circle-check me-2"></i>
+                    Bạn đã hoàn thành bài học này!
+                </div>
+            <?php endif; ?>
+
         <?php endif; ?>
+
 
         <!-- ============================= -->
         <!-- TÀI LIỆU ĐÍNH KÈM             -->

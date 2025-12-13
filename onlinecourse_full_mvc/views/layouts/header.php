@@ -27,6 +27,9 @@ $currentUser = $_SESSION['user'] ?? null;
 
     <!-- Custom CSS -->
     <link rel="stylesheet" href="assets/css/style.css">
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <style>
 .active-menu {
