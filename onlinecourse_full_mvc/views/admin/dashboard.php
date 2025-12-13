@@ -1,4 +1,4 @@
-<?php include __DIR__ . '/../layouts/admin_sidebar.php'; ?>
+
 
 <h3 class="mb-4">Trang quản trị</h3>
 

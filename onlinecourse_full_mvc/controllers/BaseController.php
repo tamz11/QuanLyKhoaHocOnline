@@ -2,29 +2,34 @@
 
 abstract class BaseController {
 
-    // Điều hướng (redirect)
     protected function redirect($url) {
         header("Location: $url");
         exit();
     }
 
-    // Load view
     protected function render($view, $data = []) {
         extract($data);
 
+        $currentUser = $_SESSION['user'] ?? null;
+
         include __DIR__ . '/../views/layouts/header.php';
+
+        // Nếu view thuộc admin -> tự động chèn sidebar
+        if (strpos($view, 'admin/') === 0) {
+            include __DIR__ . '/../views/layouts/admin_sidebar.php';
+        }
+
         include __DIR__ . '/../views/' . $view . '.php';
+
         include __DIR__ . '/../views/layouts/footer.php';
     }
 
-    // Yêu cầu đăng nhập
     protected function requireLogin() {
         if (!isset($_SESSION['user'])) {
             $this->redirect("index.php?controller=auth&action=login");
         }
     }
 
-    // Kiểm tra role
     protected function requireRole($roles = []) {
         $this->requireLogin();
 
@@ -32,5 +37,4 @@ abstract class BaseController {
             die("Bạn không có quyền truy cập trang này!");
         }
     }
-
 }
