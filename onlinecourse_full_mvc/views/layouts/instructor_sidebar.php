@@ -6,7 +6,7 @@
         <aside class="col-md-3 col-lg-2 mb-4">
             <div class="card shadow-sm">
                 <div class="card-body text-center">
-                    <img src="assets/uploads/avatars/<?= htmlspecialchars($currentUser['avatar'] ?? 'instructor.png') ?>"
+                    <img src="assets/uploads/avatars/<?= htmlspecialchars($currentUser['avatar'] ?? 'default.png') ?>"
                          class="rounded-circle mb-3" width="96" height="96" alt="Instructor">
                     <h6 class="mb-0"><?= htmlspecialchars($currentUser['fullname'] ?? 'Giảng viên') ?></h6>
                     <p class="text-muted small mb-0"><?= htmlspecialchars($currentUser['email'] ?? '') ?></p>
