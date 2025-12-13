@@ -29,7 +29,6 @@ class AuthController extends BaseController {
             if (!$user) {
                 $error = "Tài khoản không tồn tại.";
             } 
-            // ⭐ THÊM MỚI: kiểm tra tài khoản bị khóa
             elseif ($user['is_active'] == 0) {
                 $error = "Tài khoản của bạn đã bị vô hiệu hóa!";
             }
@@ -75,7 +74,6 @@ class AuthController extends BaseController {
             return $this->render("auth/login", ['error' => "Tài khoản không tồn tại!"]);
         }
 
-        // ⭐ THÊM MỚI: kiểm tra tài khoản bị khóa
         if ($user['is_active'] == 0) {
             return $this->render("auth/login", ['error' => "Tài khoản của bạn đã bị vô hiệu hóa!"]);
         }
@@ -148,7 +146,13 @@ class AuthController extends BaseController {
         ];
 
         if ($this->userModel->createUser($data)) {
-            return $this->render("auth/register", ['success' => "Đăng ký thành công!"]);
+
+            // ⭐⭐⭐ TỰ ĐỘNG ĐĂNG NHẬP NGAY SAU KHI ĐĂNG KÝ ⭐⭐⭐
+            $newUser = $this->userModel->findByLogin($email);
+            $_SESSION['user'] = $newUser;
+
+            // Chuyển sang dashboard học viên
+            return $this->redirect("index.php?controller=student&action=dashboard");
         }
 
         return $this->render("auth/register", ['error' => "Có lỗi xảy ra, vui lòng thử lại!"]);
@@ -157,23 +161,19 @@ class AuthController extends BaseController {
     // ============================
     //  ĐĂNG XUẤT
     // ============================
-public function logout() {
-    // Xóa toàn bộ session
-    session_unset();
-    session_destroy();
+    public function logout() {
+        session_unset();
+        session_destroy();
 
-    // Xóa session cookie để đảm bảo logout thật sự
-    if (ini_get("session.use_cookies")) {
-        $params = session_get_cookie_params();
-        setcookie(session_name(), '', time() - 42000,
-            $params["path"], $params["domain"],
-            $params["secure"], $params["httponly"]
-        );
-    }
+        if (ini_get("session.use_cookies")) {
+            $params = session_get_cookie_params();
+            setcookie(session_name(), '', time() - 42000,
+                $params["path"], $params["domain"],
+                $params["secure"], $params["httponly"]
+            );
+        }
 
-    // Chuyển hướng về login
-    header("Location: index.php?controller=auth&action=login");
-    exit;
+        header("Location: index.php?controller=auth&action=login");
+        exit;
     }
 }
-
