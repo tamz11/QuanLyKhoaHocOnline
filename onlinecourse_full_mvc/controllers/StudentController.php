@@ -49,53 +49,56 @@ class StudentController extends BaseController {
         ]);
     }
 
-    // Tiến độ học tập
-    public function courseProgress() {
-        $this->requireRole([0, 1, 2]);
+// ================================
+// TIẾN ĐỘ HỌC TẬP
+// ================================
+public function courseProgress() {
+    $this->requireRole([0, 1, 2]);
 
-        $studentId = $_SESSION['user']['id'];
-        $courseId  = $_GET['course_id'] ?? null;
+    $studentId = $_SESSION['user']['id'];
+    $courseId  = $_GET['course_id'] ?? null;
 
-        if (!$courseId) {
-            header("Location: index.php?controller=student&action=myCourses");
-            exit;
-        }
-
-        // Course
-        $course = $this->courseModel->findById($courseId);
-
-        // Lessons + trạng thái
-        $lessons = $this->lessonModel->getLessonsWithProgress($courseId, $studentId);
-
-        // Danh sách lesson đã hoàn thành (ID)
-        $completedLessons = $this->enrollModel->getCompletedLessons($studentId, $courseId);
-
-        // Xác định current lesson
-        if (!empty($lessons)) {
-            $lessonId = $_GET['lesson_id'] ?? $lessons[0]['id'];
-            $currentLesson = $this->lessonModel->findById($lessonId);
-        } else {
-            $currentLesson = null;
-        }
-
-        // Materials
-        $materials = $currentLesson
-            ? $this->lessonModel->getMaterials($currentLesson['id'])
-            : [];
-
-        // Progress
-        $progress = $this->enrollModel->recalcAndUpdateProgress($studentId, $courseId);
-
-        $this->render('student/course_progress', [
-            'course'           => $course,
-            'lessons'          => $lessons,
-            'currentLesson'    => $currentLesson,
-            'materials'        => $materials,
-            'completedLessons' => $completedLessons,
-            'progress'         => $progress,
-            'currentUser'      => $_SESSION['user']
-        ]);
+    if (!$courseId) {
+        header("Location: index.php?controller=student&action=myCourses");
+        exit;
     }
+
+    // 1. Lấy khóa học
+    $course = $this->courseModel->findById($courseId);
+
+    // 2. Lấy lessons (có thể rỗng)
+    $lessons = $this->lessonModel->getLessonsWithProgress($courseId, $studentId);
+
+    // 3. Danh sách lesson đã hoàn thành (luôn là mảng)
+    $completedLessons = $this->enrollModel->getCompletedLessons($studentId, $courseId) ?? [];
+
+    // 4. Xác định bài học đang xem
+    if (!empty($lessons)) {
+        $lessonId = $_GET['lesson_id'] ?? $lessons[0]['id'];
+        $currentLesson = $this->lessonModel->findById($lessonId);
+    } else {
+        $currentLesson = null; // ⚠️ RẤT QUAN TRỌNG
+    }
+
+    // 5. Lấy tài liệu (nếu có lesson)
+    $materials = $currentLesson
+        ? $this->lessonModel->getMaterials($currentLesson['id'])
+        : [];
+
+    // 6. Tính lại progress (0–100)
+    $progress = $this->enrollModel->recalcAndUpdateProgress($studentId, $courseId);
+
+    $this->render('student/course_progress', [
+        'course'           => $course,
+        'lessons'          => $lessons,
+        'currentLesson'    => $currentLesson,
+        'materials'        => $materials,
+        'completedLessons' => $completedLessons,
+        'progress'         => $progress,
+        'currentUser'      => $_SESSION['user']
+    ]);
+}
+
 
 
     // Đổi mật khẩu
