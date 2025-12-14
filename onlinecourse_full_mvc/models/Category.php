@@ -10,8 +10,8 @@ class Category {
     }
 
     public function countAll() {
-        $sql = "SELECT COUNT(*) AS total FROM categories";
-        return $this->pdo->query($sql)->fetch()['total'] ?? 0;
+        $sql = "SELECT COUNT(*) FROM categories";
+        return $this->pdo->query($sql)->fetchColumn();
     }
 
     public function getAll() {

@@ -189,4 +189,23 @@ class User {
             ':id'       => $id
         ]);
     }
+
+    // Đếm tổng user
+    public function countAll() {
+        $sql = "SELECT COUNT(*) FROM users";
+        return $this->conn->query($sql)->fetchColumn();
+    }
+
+    // Đếm học viên (role = 0)
+    public function countStudents() {
+        $sql = "SELECT COUNT(*) FROM users WHERE role = 0";
+        return $this->conn->query($sql)->fetchColumn();
+    }
+
+    // Đếm giảng viên (role = 1)
+    public function countInstructors() {
+        $sql = "SELECT COUNT(*) FROM users WHERE role = 1";
+        return $this->conn->query($sql)->fetchColumn();
+    }
+    
 }

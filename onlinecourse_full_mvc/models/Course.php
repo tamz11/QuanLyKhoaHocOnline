@@ -90,13 +90,13 @@ class Course {
     }
 
     public function countAll() {
-        $sql = "SELECT COUNT(*) AS total FROM courses";
-        return $this->pdo->query($sql)->fetch()['total'] ?? 0;
+        $sql = "SELECT COUNT(*) FROM courses";
+        return (int) $this->pdo->query($sql)->fetchColumn();
     }
 
     public function countPending() {
-        $sql = "SELECT COUNT(*) AS total FROM courses WHERE approved = 0";
-        return $this->pdo->query($sql)->fetch()['total'] ?? 0;
+        $sql = "SELECT COUNT(*) FROM courses WHERE approved = 0";
+        return (int) $this->pdo->query($sql)->fetchColumn();
     }
 
     public function topCourses() {
