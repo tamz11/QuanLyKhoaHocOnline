@@ -9,9 +9,9 @@
                     OnlineCourse cung cấp nền tảng học trực tuyến cho sinh viên & giảng viên CNTT.
                 </p>
                 <div class="d-flex gap-2">
-                    <a href="#" class="btn btn-outline-light btn-sm"><i class="fa-brands fa-facebook"></i></a>
-                    <a href="#" class="btn btn-outline-light btn-sm"><i class="fa-brands fa-twitter"></i></a>
-                    <a href="#" class="btn btn-outline-light btn-sm"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="https://www.facebook.com/Hury.Bui.1302/?locale=vi_VN" class="btn btn-outline-light btn-sm"><i class="fa-brands fa-facebook"></i></a>
+                    <a href="https://x.com/Hurybui1" class="btn btn-outline-light btn-sm"><i class="fa-brands fa-twitter"></i></a>
+                    <a href="https://www.instagram.com/hurybui1302/" class="btn btn-outline-light btn-sm"><i class="fa-brands fa-instagram"></i></a>
                 </div>
             </div>
             <div class="col-md-4">

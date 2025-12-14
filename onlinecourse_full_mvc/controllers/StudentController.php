@@ -24,19 +24,80 @@ class StudentController extends BaseController {
 
         $studentId = $_SESSION['user']['id'];
 
-        $overallProgress   = $this->enrollModel->getOverallProgress($studentId);
-        $totalCourses      = $this->enrollModel->countMyCourses($studentId);
-        $completedCourses  = $this->enrollModel->countCompletedCourses($studentId);
+        $overallProgress  = $this->enrollModel->getOverallProgress($studentId);
+        $totalCourses     = $this->enrollModel->countMyCourses($studentId);
+        $completedCourses = $this->enrollModel->countCompletedCourses($studentId);
 
         $this->render('student/dashboard', [
-            'overallProgress'   => $overallProgress,
-            'totalCourses'      => $totalCourses,
-            'completedCourses'  => $completedCourses,
-            'currentUser'       => $_SESSION['user']
+            'overallProgress'  => $overallProgress,
+            'totalCourses'     => $totalCourses,
+            'completedCourses' => $completedCourses,
+            'currentUser'      => $_SESSION['user']
         ]);
     }
 
-    // ================= REQUEST INSTRUCTOR FORM =================
+    // ================= KHÓA HỌC ĐÃ ĐĂNG KÝ =================
+    public function myCourses() {
+        $this->requireRole([0, 1, 2]);
+
+        $studentId = $_SESSION['user']['id'];
+        $myCourses = $this->enrollModel->getMyCourses($studentId);
+
+        $this->render('student/my_courses', [
+            'myCourses'   => $myCourses,
+            'currentUser' => $_SESSION['user']
+        ]);
+    }
+
+    // ================= TIẾN ĐỘ HỌC TẬP =================
+    public function courseProgress() {
+        $this->requireRole([0, 1, 2]);
+
+        $studentId = $_SESSION['user']['id'];
+        $courseId  = $_GET['course_id'] ?? null;
+
+        if (!$courseId) {
+            header("Location: index.php?controller=student&action=myCourses");
+            exit;
+        }
+
+        // 1. Lấy khóa học
+        $course = $this->courseModel->findById($courseId);
+
+        // 2. Danh sách bài học + progress
+        $lessons = $this->lessonModel->getLessonsWithProgress($courseId, $studentId);
+
+        // 3. Lessons đã hoàn thành
+        $completedLessons = $this->enrollModel->getCompletedLessons($studentId, $courseId) ?? [];
+
+        // 4. Bài học hiện tại
+        if (!empty($lessons)) {
+            $lessonId = $_GET['lesson_id'] ?? $lessons[0]['id'];
+            $currentLesson = $this->lessonModel->findById($lessonId);
+        } else {
+            $currentLesson = null;
+        }
+
+        // 5. Tài liệu
+        $materials = $currentLesson
+            ? $this->lessonModel->getMaterials($currentLesson['id'])
+            : [];
+
+        // 6. Cập nhật tiến độ
+        $progress = $this->enrollModel->recalcAndUpdateProgress($studentId, $courseId);
+
+        $this->render('student/course_progress', [
+            'course'           => $course,
+            'lessons'          => $lessons,
+            'currentLesson'    => $currentLesson,
+            'materials'        => $materials,
+            'completedLessons' => $completedLessons,
+            'progress'         => $progress,
+            'currentUser'      => $_SESSION['user']
+        ]);
+    }
+
+    // ================= FORM YÊU CẦU GIẢNG VIÊN =================
     public function requestInstructor() {
         $this->requireRole([0]);
 
@@ -48,7 +109,7 @@ class StudentController extends BaseController {
         ]);
     }
 
-    // ================= HANDLE REQUEST (FIXED) =================
+    // ================= XỬ LÝ GỬI YÊU CẦU GIẢNG VIÊN =================
     public function doRequestInstructor() {
         $this->requireRole([0]);
 
@@ -66,13 +127,11 @@ class StudentController extends BaseController {
         $userId = $_SESSION['user']['id'];
         $requestModel = new InstructorRequest();
 
-        // Đã gửi yêu cầu trước đó
         if ($requestModel->findByUserId($userId)) {
             $_SESSION['request_error'] = 'Bạn đã gửi yêu cầu trước đó rồi!';
             return $this->redirect("index.php?controller=student&action=requestInstructor");
         }
 
-        // Tạo yêu cầu
         $requestModel->create([
             'user_id'    => $userId,
             'message'    => $description,
@@ -80,13 +139,11 @@ class StudentController extends BaseController {
             'created_at' => date('Y-m-d H:i:s')
         ]);
 
-        // ✅ SUCCESS FLAG
         $_SESSION['request_success'] = true;
-
         return $this->redirect("index.php?controller=student&action=requestInstructor");
     }
 
-    // ================= MARK LESSON DONE =================
+    // ================= ĐÁNH DẤU HOÀN THÀNH BÀI HỌC =================
     public function markDone() {
         $this->requireRole([0]);
 
@@ -98,6 +155,43 @@ class StudentController extends BaseController {
         $this->enrollModel->recalcAndUpdateProgress($studentId, $courseId);
 
         header("Location: index.php?controller=student&action=courseProgress&course_id=$courseId&lesson_id=$lessonId");
+        exit;
+    }
+
+    // ================= ĐỔI MẬT KHẨU =================
+    public function changePassword() {
+        $this->requireRole([0, 1, 2]);
+        $this->render('student/change_password');
+    }
+
+    public function updatePassword() {
+        $this->requireRole([0, 1, 2]);
+
+        require_once __DIR__ . '/../models/User.php';
+        $userModel = new User();
+
+        $userId  = $_SESSION['user']['id'];
+        $current = $_POST['current_password'] ?? '';
+        $new     = $_POST['new_password'] ?? '';
+        $confirm = $_POST['confirm_password'] ?? '';
+
+        if ($new !== $confirm) {
+            $_SESSION['error'] = "Mật khẩu mới và xác nhận không khớp!";
+            header("Location: index.php?controller=student&action=changePassword");
+            exit;
+        }
+
+        $user = $userModel->getUserById($userId);
+        if (!$user || !password_verify($current, $user['password'])) {
+            $_SESSION['error'] = "Mật khẩu hiện tại không chính xác!";
+            header("Location: index.php?controller=student&action=changePassword");
+            exit;
+        }
+
+        $userModel->updatePassword($userId, $new);
+
+        $_SESSION['success'] = "Đổi mật khẩu thành công!";
+        header("Location: index.php?controller=student&action=changePassword");
         exit;
     }
 }

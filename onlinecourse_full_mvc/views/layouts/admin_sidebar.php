@@ -16,14 +16,11 @@
 
                     <?php 
                         $currentAdmin = $currentUser ?? ($_SESSION['user'] ?? null);
-                        $avatarFile = $currentAdmin['avatar'] ?? 'default-admin.png';
+                        $avatarFile = $currentAdmin['avatar'] ?? 'default.png';
                     ?>
 
                     <img src="assets/uploads/avatars/<?= htmlspecialchars($avatarFile) ?>"
-                         class="rounded-circle mb-3"
-                         width="96"
-                         height="96"
-                         alt="Admin Avatar">
+                         class="rounded-circle mb-3" width="96" height="96" alt="Admin Avatar">
 
                     <h6 class="mb-0">
                         <?= htmlspecialchars($currentAdmin['fullname'] ?? 'Quản trị viên') ?>
