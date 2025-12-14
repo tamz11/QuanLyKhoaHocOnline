@@ -61,10 +61,16 @@ class StudentController extends BaseController {
             exit;
         }
 
+        // 1. Khóa học
         $course = $this->courseModel->findById($courseId);
+
+        // 2. Danh sách bài học + tiến độ
         $lessons = $this->lessonModel->getLessonsWithProgress($courseId, $studentId);
+
+        // 3. Lessons đã hoàn thành
         $completedLessons = $this->enrollModel->getCompletedLessons($studentId, $courseId) ?? [];
 
+        // 4. Bài học hiện tại
         if (!empty($lessons)) {
             $lessonId = $_GET['lesson_id'] ?? $lessons[0]['id'];
             $currentLesson = $this->lessonModel->findById($lessonId);
@@ -72,10 +78,12 @@ class StudentController extends BaseController {
             $currentLesson = null;
         }
 
+        // 5. Tài liệu
         $materials = $currentLesson
             ? $this->lessonModel->getMaterials($currentLesson['id'])
             : [];
 
+        // 6. Cập nhật tiến độ
         $progress = $this->enrollModel->recalcAndUpdateProgress($studentId, $courseId);
 
         $this->render('student/course_progress', [
@@ -87,12 +95,6 @@ class StudentController extends BaseController {
             'progress'         => $progress,
             'currentUser'      => $_SESSION['user']
         ]);
-    }
-
-    /* ================= ĐỔI MẬT KHẨU ================= */
-    public function changePassword() {
-        $this->requireRole([0, 1, 2]);
-        $this->render('student/change_password');
     }
 
     /* ================= FORM YÊU CẦU GIẢNG VIÊN ================= */
@@ -107,7 +109,7 @@ class StudentController extends BaseController {
         ]);
     }
 
-    /* ================= XỬ LÝ GỬI YÊU CẦU ================= */
+    /* ================= XỬ LÝ GỬI YÊU CẦU GIẢNG VIÊN ================= */
     public function doRequestInstructor() {
         $this->requireRole([0]);
 
@@ -141,7 +143,7 @@ class StudentController extends BaseController {
         return $this->redirect("index.php?controller=student&action=requestInstructor");
     }
 
-    /* ================= ĐÁNH DẤU BÀI HỌC ================= */
+    /* ================= ĐÁNH DẤU HOÀN THÀNH BÀI HỌC ================= */
     public function markDone() {
         $this->requireRole([0]);
 
@@ -156,7 +158,12 @@ class StudentController extends BaseController {
         exit;
     }
 
-    /* ================= CẬP NHẬT MẬT KHẨU ================= */
+    /* ================= ĐỔI MẬT KHẨU ================= */
+    public function changePassword() {
+        $this->requireRole([0, 1, 2]);
+        $this->render('student/change_password');
+    }
+
     public function updatePassword() {
         $this->requireRole([0, 1, 2]);
 
@@ -169,13 +176,12 @@ class StudentController extends BaseController {
         $confirm = $_POST['confirm_password'] ?? '';
 
         if ($new !== $confirm) {
-            $_SESSION['error'] = "Mật khẩu mới và xác nhận mật khẩu không khớp!";
+            $_SESSION['error'] = "Mật khẩu mới và xác nhận không khớp!";
             header("Location: index.php?controller=student&action=changePassword");
             exit;
         }
 
         $user = $userModel->getUserById($userId);
-
         if (!$user || !password_verify($current, $user['password'])) {
             $_SESSION['error'] = "Mật khẩu hiện tại không chính xác!";
             header("Location: index.php?controller=student&action=changePassword");
@@ -184,7 +190,7 @@ class StudentController extends BaseController {
 
         $userModel->updatePassword($userId, $new);
 
-        $_SESSION['success'] = "Thay đổi mật khẩu thành công!";
+        $_SESSION['success'] = "Đổi mật khẩu thành công!";
         header("Location: index.php?controller=student&action=changePassword");
         exit;
     }
