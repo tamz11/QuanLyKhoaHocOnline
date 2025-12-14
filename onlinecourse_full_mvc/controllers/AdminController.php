@@ -161,7 +161,42 @@ class AdminController extends BaseController {
 
     public function updatePassword() {
         $this->requireRole([2]);
-        echo "Đã nhận dữ liệu đổi mật khẩu của admin!";
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            return $this->redirect('index.php?controller=admin&action=changePassword');
+        }
+
+        $currentPassword = $_POST['current_password'] ?? '';
+        $newPassword     = $_POST['new_password'] ?? '';
+        $confirmPassword = $_POST['confirm_password'] ?? '';
+
+        if (empty($currentPassword) || empty($newPassword) || empty($confirmPassword)) {
+            $_SESSION['password_error'] = 'Vui lòng nhập đầy đủ thông tin!';
+            return $this->redirect('index.php?controller=admin&action=changePassword');
+        }
+
+        if ($newPassword !== $confirmPassword) {
+            $_SESSION['password_error'] = 'Mật khẩu xác nhận không khớp!';
+            return $this->redirect('index.php?controller=admin&action=changePassword');
+        }
+
+        require_once __DIR__ . '/../models/User.php';
+        $userModel = new User();
+
+        $adminId = $_SESSION['user']['id'];
+        $admin   = $userModel->getUserById($adminId);
+
+        // Kiểm tra mật khẩu hiện tại
+        if (!password_verify($currentPassword, $admin['password'])) {
+            $_SESSION['password_error'] = 'Mật khẩu hiện tại không đúng!';
+            return $this->redirect('index.php?controller=admin&action=changePassword');
+        }
+
+        // Cập nhật mật khẩu mới
+        $userModel->updatePassword($adminId, $newPassword);
+
+        $_SESSION['password_success'] = 'Đổi mật khẩu thành công!';
+        return $this->redirect('index.php?controller=admin&action=changePassword');
     }
 
     // ================================================================

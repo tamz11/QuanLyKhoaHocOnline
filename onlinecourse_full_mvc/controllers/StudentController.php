@@ -18,7 +18,7 @@ class StudentController extends BaseController {
         $this->courseModel = new Course();
     }
 
-    // ================= DASHBOARD =================
+    /* ================= DASHBOARD ================= */
     public function dashboard() {
         $this->requireRole([0, 1, 2]);
 
@@ -36,7 +36,7 @@ class StudentController extends BaseController {
         ]);
     }
 
-    // ================= KHÓA HỌC ĐÃ ĐĂNG KÝ =================
+    /* ================= KHÓA HỌC ĐÃ ĐĂNG KÝ ================= */
     public function myCourses() {
         $this->requireRole([0, 1, 2]);
 
@@ -49,7 +49,7 @@ class StudentController extends BaseController {
         ]);
     }
 
-    // ================= TIẾN ĐỘ HỌC TẬP =================
+    /* ================= TIẾN ĐỘ HỌC TẬP ================= */
     public function courseProgress() {
         $this->requireRole([0, 1, 2]);
 
@@ -61,10 +61,10 @@ class StudentController extends BaseController {
             exit;
         }
 
-        // 1. Lấy khóa học
+        // 1. Khóa học
         $course = $this->courseModel->findById($courseId);
 
-        // 2. Danh sách bài học + progress
+        // 2. Danh sách bài học + tiến độ
         $lessons = $this->lessonModel->getLessonsWithProgress($courseId, $studentId);
 
         // 3. Lessons đã hoàn thành
@@ -97,19 +97,19 @@ class StudentController extends BaseController {
         ]);
     }
 
-    // ================= FORM YÊU CẦU GIẢNG VIÊN =================
+    /* ================= FORM YÊU CẦU GIẢNG VIÊN ================= */
     public function requestInstructor() {
         $this->requireRole([0]);
 
         $requestModel = new InstructorRequest();
         $existing = $requestModel->findByUserId($_SESSION['user']['id']);
 
-        $this->render("student/request_instructor", [
+        $this->render('student/request_instructor', [
             'existing' => $existing
         ]);
     }
 
-    // ================= XỬ LÝ GỬI YÊU CẦU GIẢNG VIÊN =================
+    /* ================= XỬ LÝ GỬI YÊU CẦU GIẢNG VIÊN ================= */
     public function doRequestInstructor() {
         $this->requireRole([0]);
 
@@ -143,7 +143,7 @@ class StudentController extends BaseController {
         return $this->redirect("index.php?controller=student&action=requestInstructor");
     }
 
-    // ================= ĐÁNH DẤU HOÀN THÀNH BÀI HỌC =================
+    /* ================= ĐÁNH DẤU HOÀN THÀNH BÀI HỌC ================= */
     public function markDone() {
         $this->requireRole([0]);
 
@@ -158,7 +158,7 @@ class StudentController extends BaseController {
         exit;
     }
 
-    // ================= ĐỔI MẬT KHẨU =================
+    /* ================= ĐỔI MẬT KHẨU ================= */
     public function changePassword() {
         $this->requireRole([0, 1, 2]);
         $this->render('student/change_password');
