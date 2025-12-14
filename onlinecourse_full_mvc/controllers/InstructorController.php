@@ -78,7 +78,7 @@ class InstructorController extends BaseController
 
         $courseModel = new Course();
         if ($courseModel->create($data, $this->currentUser['id'])) {
-            header('Location: index.php?controller=instructor&action=myCourses&success=1');
+            header('Location: index.php?controller=instructor&action=myCourses&success=1&message=Khóa học đã được tạo và đang chờ duyệt từ admin.');
         } else {
             header('Location: index.php?controller=instructor&action=createCourse&error=1');
         }

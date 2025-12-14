@@ -148,7 +148,30 @@ class AdminController extends BaseController {
     // ================================================================
     public function approveCourses() {
         $this->requireRole([2]);
-        $this->render('admin/courses/approve');
+
+        require_once __DIR__ . '/../models/Course.php';
+        $courseModel = new Course();
+        $pendingCourses = $courseModel->getPending();
+
+        $this->render('admin/courses/approve', [
+            'pendingCourses' => $pendingCourses
+        ]);
+    }
+
+    public function approveCourse() {
+        $this->requireRole([2]);
+
+        $id = $_GET['id'] ?? null;
+        if (!$id) {
+            return $this->redirect('index.php?controller=admin&action=approveCourses');
+        }
+
+        require_once __DIR__ . '/../models/Course.php';
+        $courseModel = new Course();
+        $courseModel->approve($id);
+
+        $_SESSION['flash'] = 'Khóa học đã được duyệt thành công!';
+        return $this->redirect('index.php?controller=admin&action=approveCourses');
     }
 
     // ================================================================

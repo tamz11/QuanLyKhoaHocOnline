@@ -26,8 +26,8 @@ class CourseController extends BaseController {
         if ($category) {
             $courses = $this->courseModel->getByCategory($category);
         } else {
-            // Lấy tất cả khóa học có giảng viên
-            $courses = $this->courseModel->getAll();
+            // Lấy tất cả khóa học đã duyệt
+            $courses = $this->courseModel->getAllApproved();
         }
 
         $categories = $this->categoryModel->getAll();
