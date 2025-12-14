@@ -17,6 +17,7 @@ class Course {
                     u.fullname AS instructor_name
                 FROM courses c
                 LEFT JOIN users u ON c.instructor_id = u.id
+                WHERE c.approved = 1
                 ORDER BY c.id DESC";
 
         return $this->pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
@@ -37,7 +38,7 @@ class Course {
         $sql = "SELECT c.*, u.fullname AS instructor_name
                 FROM courses c
                 LEFT JOIN users u ON c.instructor_id = u.id
-                WHERE c.category_id = ?
+                WHERE c.category_id = ? AND c.approved = 1
                 ORDER BY c.id DESC";
 
         $stmt = $this->pdo->prepare($sql);
@@ -56,7 +57,7 @@ class Course {
         $sql = "SELECT c.*, u.fullname AS instructor_name
                 FROM courses c
                 LEFT JOIN users u ON c.instructor_id = u.id
-                WHERE c.title LIKE ? OR c.description LIKE ?
+                WHERE (c.title LIKE ? OR c.description LIKE ?) AND c.approved = 1
                 ORDER BY c.id DESC";
 
         $stmt = $this->pdo->prepare($sql);
@@ -112,6 +113,7 @@ class Course {
                 FROM courses c
                 LEFT JOIN enrollments e ON c.id = e.course_id
                 LEFT JOIN users u ON c.instructor_id = u.id
+                WHERE c.approved = 1
                 GROUP BY c.id
                 ORDER BY total_students DESC
                 LIMIT 4";

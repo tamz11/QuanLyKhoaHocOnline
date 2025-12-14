@@ -3,7 +3,7 @@
 <?php if (isset($_GET['success'])): ?>
     <div class="alert alert-success alert-dismissible fade show" role="alert">
         <?php if ($_GET['success'] == 1): ?>
-            Khóa học đã được tạo thành công!
+            <?= htmlspecialchars($_GET['message'] ?? 'Khóa học đã được tạo thành công!') ?>
         <?php elseif ($_GET['success'] == 2): ?>
             Khóa học đã được cập nhật thành công!
         <?php elseif ($_GET['success'] == 3): ?>
@@ -47,7 +47,13 @@
                 <td><?= htmlspecialchars($course['category_name']) ?></td>
                 <td><?= number_format($course['price']) ?>đ</td>
                 <td><?= htmlspecialchars($course['level']) ?></td>
-                <td><?= htmlspecialchars($course['status'] ?? 'Đã duyệt') ?></td>
+                <td>
+                    <?php if ($course['approved'] == 1): ?>
+                        <span class="badge bg-success">Đã duyệt</span>
+                    <?php else: ?>
+                        <span class="badge bg-warning">Chờ duyệt</span>
+                    <?php endif; ?>
+                </td>
                 <td class="text-end">
                     <a href="index.php?controller=instructor&action=editCourse&id=<?= $course['id'] ?>"
                        class="btn btn-sm btn-outline-primary">
